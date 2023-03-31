@@ -46,13 +46,16 @@
                                 <td>{{$contrato->contrato}}</td>
                                 <td>
                                     @if($contrato->servidor->matricula !=$contrato->semelhante->servidor->matricula)
-                                        Matricula{{"\n"}}
+                                        Matricula
                                     @endif
                                     @if($contrato->valor_parcela !=$contrato->semelhante->valor_parcela)
-                                        Desconto{{"\n"}}
+                                        ,Desconto
                                     @endif
                                     @if($contrato->n_parcela_referencia !=$contrato->semelhante->n_parcela_referencia)
-                                        Parcela
+                                        ,Parcela
+                                    @endif
+                                    @if($contrato->total_parcela !=$contrato->semelhante->total_parcela)
+                                        ,Prazo
                                     @endif
                                 </td>
 

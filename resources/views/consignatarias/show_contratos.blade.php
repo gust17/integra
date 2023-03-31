@@ -88,7 +88,7 @@
 
                     </tr>
                     <tr>
-                        <td>Contratos sem Servidor</td>
+                        <td>Contratos com  Inexistentes/Divergentes</td>
                         <td>{{$contratosSemServidor->count()}}</td>
                         <td>
                             <a href="{{route('consignataria.sem_servidor',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
@@ -103,7 +103,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>Possiveis Renegociações</td>
+                        <td>Possiveis Renegociações/Novos Contratos</td>
                         <td>{{$possivelRenegociacao->count()}}</td>
                         <td>
                             <a href="{{route('consignataria.novo-contrato',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
@@ -111,7 +111,7 @@
                     </tr>
 
                     <tr>
-                        <td>Contratos / Parecidos</td>
+                        <td>Contratos Parecidos/Semelhantes</td>
                         <td>{{$contratos_semelhantes->count()}}</td>
                         <td>
                             <a href="{{route('consignataria.semelhante',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
