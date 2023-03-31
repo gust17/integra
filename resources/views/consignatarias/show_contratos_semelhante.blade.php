@@ -18,8 +18,8 @@
                             <th>Servidor</th>
                             <th>Matricula Banco</th>
                             <th>Matricula Consignante</th>
-                            <th>Valor Descontato Banco</th>
-                            <th>Valor Descontato Consignante</th>
+                            <th>Valor descontado Banco</th>
+                            <th>Valor descontado Consignante</th>
                             <th>Prazo Total Banco</th>
                             <th>Prazo Total Consignante</th>
                             <th>Prestação Atual Banco</th>

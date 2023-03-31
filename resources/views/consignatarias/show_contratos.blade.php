@@ -22,7 +22,7 @@
                         <tr>
                             <th>Servidor</th>
                             <th>Matricula</th>
-                            <th>Valor Descontato</th>
+                            <th>Valor descontado</th>
                             <th>Prazo Total</th>
                             <th>Parcela Atual</th>
                             <th>Contrato</th>
@@ -147,7 +147,7 @@
                         <tr>
                             <th>Servidor</th>
                             <th>Matricula</th>
-                            <th>Valor Descontato</th>
+                            <th>Valor Descontado</th>
                             <th>Prazo Total</th>
                             <th>Prestação Atual</th>
                             <th>Contrato</th>
