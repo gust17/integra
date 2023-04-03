@@ -15,7 +15,7 @@ class PessoaController extends Controller
      */
     public function index()
     {
-        $pessoas = Pessoa::all();
+        $pessoas = Pessoa::withCount('servidors')->get();
         return view('pessoa.index', compact('pessoas'));
     }
 
@@ -87,6 +87,12 @@ class PessoaController extends Controller
         //
     }
 
+    public function create_import(Request $request)
+    {
+        return view('pessoa.import');
+
+        // return redirect()->back();
+    }
     public function import(Request $request)
     {
         $file = $request->file('file');

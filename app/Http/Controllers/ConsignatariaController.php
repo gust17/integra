@@ -155,4 +155,13 @@ class ConsignatariaController extends Controller
         $title = "Renegociação ou novo contrato";
         return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title'));
     }
+
+
+    public function create_import()
+    {
+        $consignatarias = Consignataria::all();
+
+        return view('consignatarias.import',compact('consignatarias'));
+        # code...
+    }
 }
