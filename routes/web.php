@@ -24,7 +24,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::resource('consignatarias',\App\Http\Controllers\ConsignatariaController::class);
 Route::resource('pessoas',\App\Http\Controllers\PessoaController::class);
-Route::resource('contratos',\App\Http\Controllers\ContratoController::class);
+Route::resource('contratos',\App\Http\Controllers\ContratoController::class)->middleware('auth');
 Route::post('contrato-import',[\App\Http\Controllers\ContratoController::class,'import'])->name('contrato.import');
 Route::get('consignatarias/{id}/validadas',[\App\Http\Controllers\ConsignatariaController::class,'validada'])->name('consignataria.validada');
 Route::get('consignataria/import',[\App\Http\Controllers\ConsignatariaController::class,'create_import'])->name('consignataria.import');

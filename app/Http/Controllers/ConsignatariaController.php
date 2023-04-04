@@ -44,12 +44,18 @@ class ConsignatariaController extends Controller
         //dd($consignataria);
 
 
+
+
+        //dd($consignataria);
+        $id_reterirar_consulta = $consignataria->contratos->whereNotNull('contrato_id')->pluck('contrato_id')->toArray();
+        //dd($id_reterirar_consulta);
+      
         // dd($servidorSemPessoa);
 
-// Recupera os contratos da consignatária
+        // Recupera os contratos da consignatária
         $contratos = $consignataria->contratos;
 
-// Filtra os contratos que não possuem servidor ativo
+        // Filtra os contratos que não possuem servidor ativo
         $contratosSemPessoa = $contratos->whereNotNull('pessoa_existente');
         $contratosSemServidor = $contratos->whereNotNull('servidor_existente');
         $possivelRenegociacao = $contratos->where('n_parcela_referencia', 1)->where('status', '!=', 1);
@@ -108,7 +114,7 @@ class ConsignatariaController extends Controller
         $consignataria = Consignataria::find($id);
         $contratos = $consignataria->contratos->where('status', '!=', 1);
         $title = 'Não Validadas';
-        return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria','title'));
+        return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title'));
 
     }
 
@@ -142,7 +148,8 @@ class ConsignatariaController extends Controller
     public function sem_banco($id)
     {
         $consignataria = Consignataria::find($id);
-        $contratos = $consignataria->contratos->where('contrato', 0);
+        $id_reterirar_consulta = $consignataria->contratos->whereNotNull('contrato_id')->pluck('contrato_id')->toArray();
+        $contratos = $consignataria->contratos->where('contrato', 0)->whereNotIn('id', $id_reterirar_consulta);
         $title = "não encontrados no Arquivo do banco";
         return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title'));
 
@@ -151,7 +158,8 @@ class ConsignatariaController extends Controller
     public function novo_contrato($id)
     {
         $consignataria = Consignataria::find($id);
-        $contratos = $consignataria->contratos->where('n_parcela_referencia', 1);
+        $id_reterirar_consulta = $consignataria->contratos->whereNotNull('contrato_id')->pluck('contrato_id')->toArray();
+        $contratos = $consignataria->contratos->where('n_parcela_referencia', 1)->whereNotIn('id', $id_reterirar_consulta);
         $title = "Renegociação ou novo contrato";
         return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title'));
     }
@@ -161,7 +169,7 @@ class ConsignatariaController extends Controller
     {
         $consignatarias = Consignataria::all();
 
-        return view('consignatarias.import',compact('consignatarias'));
+        return view('consignatarias.import', compact('consignatarias'));
         # code...
     }
 }
