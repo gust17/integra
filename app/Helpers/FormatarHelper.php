@@ -18,3 +18,10 @@ if (!function_exists('format_porcentagem')) {
         return $valor;
     }
 }
+
+if (!function_exists('str_insert')) {
+    function str_insert($str, $insert, $pos)
+    {
+        return substr($str, 0, $pos) . $insert . substr($str, $pos);
+    }
+}

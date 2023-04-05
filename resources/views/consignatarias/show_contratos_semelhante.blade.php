@@ -15,7 +15,9 @@
                 </h3>
             </div>
             <div class="card-body">
-                <form action="" method="post">
+                <form action="{{route('consignataria.semelhante.pesquisa')}}" method="post">
+                    @csrf
+                    <input type="hidden" name="consignataria" value="{{$consignataria->id}}">
                     <div class="row">
                         <div class="form-group col">
                             <label for="">Matricula</label>

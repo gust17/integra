@@ -49,7 +49,7 @@ class ConsignatariaController extends Controller
         //dd($consignataria);
         $id_reterirar_consulta = $consignataria->contratos->whereNotNull('contrato_id')->pluck('contrato_id')->toArray();
         //dd($id_reterirar_consulta);
-      
+
         // dd($servidorSemPessoa);
 
         // Recupera os contratos da consignatária
@@ -171,5 +171,52 @@ class ConsignatariaController extends Controller
 
         return view('consignatarias.import', compact('consignatarias'));
         # code...
+    }
+
+
+    public function pesquisa_semelhante(Request $request)
+    {
+
+        $consignataria = Consignataria::find($request->consignataria);
+
+        $contratos = $consignataria->contratos->whereNotNull('contrato_id');
+
+        if ($request->matricula_inexistente) {
+            $matriculas = Servidor::where("ativo", 0)->pluck('id')->toArray();
+            $contratos = $contratos->whereIn('servidor_id', $matriculas);
+        }
+        if ($request->matricula) {
+            $matriculasInexistentes = $contratos->filter(function ($contrato) {
+                return $contrato->servidor_id != $contrato->semelhante->servidor->id;
+            })->pluck('id');
+            $contratos = $matriculasInexistentes->count() ? $contratos->whereIn('id', $matriculasInexistentes) : $contratos;
+        }
+
+        // Filtra os contratos com descontos diferentes, se necessário
+        if ($request->desconto) {
+            $descontosDiferentes = $contratos->filter(function ($contrato) {
+                return $contrato->valor_parcela != $contrato->semelhante->valor_parcela;
+            })->pluck('id');
+            $contratos = $descontosDiferentes->count() ? $contratos->whereIn('id', $descontosDiferentes) : $contratos;
+        }
+        if ($request->parcela) {
+            $parcelasDiferentes = $contratos->filter(function ($contrato) {
+                return $contrato->n_parcela_referencia != $contrato->semelhante->n_parcela_referencia;
+            })->pluck('id');
+            $contratos = $parcelasDiferentes->count() ? $contratos->whereIn('id', $parcelasDiferentes) : $contratos;
+        }
+
+        // Filtra os contratos com prazos diferentes, se necessário
+        if ($request->prazo) {
+            $prazosDiferentes = $contratos->filter(function ($contrato) {
+                return $contrato->total_parcela != $contrato->semelhante->total_parcela;
+            })->pluck('id');
+            $contratos = $prazosDiferentes->count() ? $contratos->whereIn('id', $prazosDiferentes) : $contratos;
+        }
+        # code...
+
+
+        $title = "Semelhantes Filtro";
+        return view('consignatarias.show_contratos_semelhante', compact('contratos', 'consignataria', 'title'));
     }
 }
