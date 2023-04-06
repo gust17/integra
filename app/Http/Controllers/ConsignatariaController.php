@@ -84,8 +84,11 @@ class ConsignatariaController extends Controller
     public function import(Request $request)
     {
         $file = $request->file('file');
+        $consignatariaImport = new ConsignatariaImport($request->consignataria);
 
-        Excel::import(new ConsignatariaImport(), $file);
+
+        //Excel::import($pessoaImport, $file);
+        Excel::import($consignatariaImport, $file);
 
         return redirect()->back();
     }

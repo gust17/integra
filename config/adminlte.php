@@ -337,6 +337,10 @@ return [
             'icon' => 'fas fa-fw fa-cogs',
             'submenu' => [
                 [
+                    'text' => 'Consignatarias',
+                    'url' => 'consignataria/import',
+                ],
+                [
                     'text' => 'Pessoas/Servidores',
                     'url' => 'pessoa/import',
                 ],
