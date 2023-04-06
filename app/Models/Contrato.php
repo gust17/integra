@@ -32,7 +32,8 @@ class Contrato extends Model
         'valor_desconto_semelhante',
         'pessoa_existente',
         'servidor_existente',
-        'contrato_id'
+        'contrato_id',
+        'averbador_id'
     ];
 
     public function servidor()
