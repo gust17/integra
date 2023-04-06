@@ -42,6 +42,7 @@ Route::post('consignatarias/contrato-semelhante/pesquisa', [\App\Http\Controller
 Route::post('pessoa-import', [\App\Http\Controllers\PessoaController::class, 'import'])->name('pessoa.import');
 Route::get('pessoa/import', [\App\Http\Controllers\PessoaController::class, 'create_import']);
 Route::resource('consignante-master', \App\Http\Controllers\ConsignanteMasterController::class);
+Route::resource('consignante', \App\Http\Controllers\ConsignanteController::class);
 
 Route::get('testeimport', function () {
     return view('teste.import');
