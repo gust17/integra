@@ -31,7 +31,7 @@ Route::resource('pessoas', \App\Http\Controllers\PessoaController::class);
 Route::resource('contratos', \App\Http\Controllers\ContratoController::class)->middleware('auth');
 Route::post('contrato-import', [\App\Http\Controllers\ContratoController::class, 'import'])->name('contrato.import');
 Route::get('consignatarias/{id}/validadas', [\App\Http\Controllers\ConsignatariaController::class, 'validada'])->name('consignataria.validada');
-Route::get('consignataria/import', [\App\Http\Controllers\ConsignatariaController::class, 'create_import'])->name('consignataria.import');
+Route::get('consignataria/import', [\App\Http\Controllers\ConsignatariaController::class, 'create_import'])->name('consignataria.index');
 Route::get('consignatarias/{id}/nao-validadas', [\App\Http\Controllers\ConsignatariaController::class, 'naovalidada'])->name('consignataria.naovalidada');
 Route::get('consignatarias/{id}/contratos_sem_pessoa', [\App\Http\Controllers\ConsignatariaController::class, 'sem_pessoa'])->name('consignataria.sem_pessoa');
 Route::get('consignatarias/{id}/contratos_sem_servidor', [\App\Http\Controllers\ConsignatariaController::class, 'sem_servidor'])->name('consignataria.sem_servidor');
@@ -85,4 +85,4 @@ Route::post('testeimport', function (Request $request) {
 Route::get('/ajax-modal/{id}', [\App\Http\Controllers\ContratoController::class, 'modal'])->name('ajax.modal');
 
 
-Route::post('importar-consignatarias', [\App\Http\Controllers\ConsignatariaController::class, 'import'])->name('importar-consignatarias');
+Route::post('importar-consignatarias', [\App\Http\Controllers\ConsignatariaController::class, 'import'])->name('consignataria.import');

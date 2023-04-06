@@ -19,13 +19,25 @@ class ConsignatariaImport implements ToModel, WithHeadingRow, WithChunkReading, 
      *
      * @return \Illuminate\Database\Eloquent\Model|null
      */
+
+    protected $consignante_id;
+
+
+    public function __construct($consignante_id)
+    {
+
+        $this->consignante_id = $consignante_id;
+    }
+
+
     public function model(array $row)
     {
 
         // dd($row);
 
 
-        $busca = str_replace(['"', '='], '', $row['="nm_consignataria"']);
+
+        $busca = str_replace(['"', '='], '', $row[$this->consignante_id]);
         // dd($busca);
 
         if (!empty($busca)) {
