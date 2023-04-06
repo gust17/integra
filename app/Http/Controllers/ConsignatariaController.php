@@ -41,18 +41,9 @@ class ConsignatariaController extends Controller
      */
     public function show(Consignataria $consignataria)
     {
-        //dd($consignataria);
 
-
-
-
-        //dd($consignataria);
         $id_reterirar_consulta = $consignataria->contratos->whereNotNull('contrato_id')->pluck('contrato_id')->toArray();
-        //dd($id_reterirar_consulta);
 
-        // dd($servidorSemPessoa);
-
-        // Recupera os contratos da consignatária
         $contratos = $consignataria->contratos;
 
         // Filtra os contratos que não possuem servidor ativo

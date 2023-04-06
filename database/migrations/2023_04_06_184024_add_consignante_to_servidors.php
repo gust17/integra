@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('contratos', function (Blueprint $table) {
-            $table->foreignIdFor(\App\Models\Averbador::class);
+        Schema::table('servidors', function (Blueprint $table) {
+            $table->foreignIdFor(\App\Models\Consignante::class);
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('contratos', function (Blueprint $table) {
-            $table->dropForeignIdFor(\App\Models\Averbador::class);
+        Schema::table('servidors', function (Blueprint $table) {
+            //
         });
     }
 };

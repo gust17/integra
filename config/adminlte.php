@@ -294,8 +294,8 @@ return [
 
 
         // Sidebar items:
-      
-       
+
+
         ['header' => 'account_settings'],
         [
             'text' => 'profile',
@@ -315,6 +315,16 @@ return [
         [
             'text' => 'Consignatarias',
             'url' => 'consignatarias',
+            'icon' => 'fas fa-fw fa-building',
+        ],
+        [
+            'text' => 'Consignante',
+            'url' => 'consignante',
+            'icon' => 'fas fa-fw fa-building',
+        ],
+        [
+            'text' => 'Averbador',
+            'url' => 'averbadors',
             'icon' => 'fas fa-fw fa-building',
         ],
         [

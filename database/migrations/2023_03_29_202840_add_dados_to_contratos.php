@@ -28,7 +28,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('contratos', function (Blueprint $table) {
-            $table->dropForeignIdFor(\App\Models\Contrato::class);
             $table->dropColumn('valor_semelhante');
             $table->dropColumn('matricula_semelhante');
             $table->dropColumn('parcela_total');

@@ -28,13 +28,15 @@ class PessoaImport implements ToModel, WithHeadingRow, WithChunkReading
     protected $nome;
     protected $cpf;
     protected $matricula;
+    protected $consignante_id;
 
 
-    public function __construct($nome, $cpf, $matricula)
+    public function __construct($nome, $cpf, $matricula, $consignante_id)
     {
         $this->nome = $nome;
         $this->cpf = $cpf;
         $this->matricula = $matricula;
+        $this->consignante_id = $consignante_id;
     }
 
     public function model(array $row)
@@ -48,7 +50,7 @@ class PessoaImport implements ToModel, WithHeadingRow, WithChunkReading
         $matricula = intval(preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->matricula]));
 
         if (empty($nome)) {
-            $filename = Carbon::now()->format('d-m-Y-H-i-s').'.txt';
+            $filename = Carbon::now()->format('d-m-Y-H-i-s') . '.txt';
             $content = implode(',', $row) . PHP_EOL;
             file_put_contents($filename, $content, FILE_APPEND);
             return null;
@@ -61,7 +63,8 @@ class PessoaImport implements ToModel, WithHeadingRow, WithChunkReading
 
         if (!$pessoa->servidors->where('matricula', $matricula)->count()) {
             $servidor = new Servidor([
-                'matricula' => $matricula
+                'matricula' => $matricula,
+                'consignante_id' =>$this->consignante_id
             ]);
             $pessoa->servidors()->save($servidor);
         }

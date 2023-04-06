@@ -20,7 +20,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes(['register' => false]);
+//Auth::routes(['register' => false]);
+Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
@@ -43,6 +44,7 @@ Route::post('pessoa-import', [\App\Http\Controllers\PessoaController::class, 'im
 Route::get('pessoa/import', [\App\Http\Controllers\PessoaController::class, 'create_import']);
 Route::resource('consignante-master', \App\Http\Controllers\ConsignanteMasterController::class);
 Route::resource('consignante', \App\Http\Controllers\ConsignanteController::class);
+Route::resource('averbadors', \App\Http\Controllers\AverbadorController::class);
 
 Route::get('testeimport', function () {
     return view('teste.import');
