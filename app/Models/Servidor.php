@@ -12,6 +12,7 @@ class Servidor extends Model
     protected $fillable = [
         'matricula',
         'pessoa_id',
+        'consignante_id',
         'ativo'
     ];
 

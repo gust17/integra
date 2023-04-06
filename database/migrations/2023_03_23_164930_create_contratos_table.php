@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignIdFor(\App\Models\Servidor::class);
             $table->foreignIdFor(\App\Models\Consignataria::class);
+            $table->foreignIdFor(\App\Models\Averbador::class);
             $table->string('contrato');
             $table->date('data_efetivacao')->nullable();
             $table->integer('total_parcela');

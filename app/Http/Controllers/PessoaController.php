@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Imports\PessoaImport;
+use App\Models\ConsignanteMaster;
 use App\Models\Pessoa;
 use App\Models\Servidor;
 use Illuminate\Http\Request;
@@ -89,22 +90,23 @@ class PessoaController extends Controller
 
     public function create_import(Request $request)
     {
-        return view('pessoa.import');
+        $consignantes_masters = ConsignanteMaster::all();
+        return view('pessoa.import', compact('consignantes_masters'));
 
         // return redirect()->back();
     }
+
     public function import(Request $request)
     {
         $file = $request->file('file');
 
         //dd($request->all());
 
-        $pessoaImport = new PessoaImport($request->nome, $request->cpf, $request->matricula);
+        $pessoaImport = new PessoaImport($request->nome, $request->cpf, $request->matricula, $request->consignante_id);
 
 
-        // Chame o método import e passe a instância de PessoaImport como argumento
         Excel::import($pessoaImport, $file);
 
-        // return redirect()->back();
+        return redirect()->back();
     }
 }

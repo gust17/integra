@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Averbador;
+use App\Models\ConsignanteMaster;
 use Illuminate\Http\Request;
 
 class AverbadorController extends Controller
@@ -12,7 +13,9 @@ class AverbadorController extends Controller
      */
     public function index()
     {
-        //
+        $averbadors = Averbador::all();
+        $consignantes_masters = ConsignanteMaster::all();
+        return view('averbador.index',compact('averbadors','consignantes_masters'));
     }
 
     /**
@@ -28,7 +31,8 @@ class AverbadorController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Averbador::create($request->all());
+        return redirect()->back();
     }
 
     /**

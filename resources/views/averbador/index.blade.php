@@ -9,12 +9,14 @@
 @section('content')
     <div class="container">
         <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Migrar com Arquivo</h3>
-            </div>
             <div class="card-body">
-                <form action="{{route('pessoa.import')}}" method="post" enctype="multipart/form-data">
+                <form action="{{route('averbadors.store')}}" method="post" enctype="multipart/form-data">
                     @csrf
+
+                    <div class="form-group">
+                        <label for="">Nome do Consignante:</label>
+                        <input class="form-control" type="text" name="name">
+                    </div>
                     <div class="form-group">
                         <label for="">Consignante-Master</label>
                         <select class="form-control consignante_master" name="consignante_master_id"
@@ -35,23 +37,6 @@
 
                         </select>
                     </div>
-
-                    <div class="form-group">
-                        <label for="">Arquivo</label>
-                        <input class="form-control" type="file" name="file">
-                    </div>
-                    <div class="form-group">
-                        <label>Coluna com Nomes</label>
-                        <input class="form-control" type="text" name="nome">
-                    </div>
-                    <div class="form-group">
-                        <label>Coluna com CPF</label>
-                        <input class="form-control" type="text" name="cpf">
-                    </div>
-                    <div class="form-group">
-                        <label>Coluna com Matriculas</label>
-                        <input class="form-control" type="text" name="matricula">
-                    </div>
                     <div class="form-group">
                         <button class="btn btn-success">Carregar</button>
                     </div>
@@ -60,39 +45,35 @@
             </div>
         </div>
     </div>
+
     <div class="container">
         <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Migrar manualmente</h3>
-            </div>
             <div class="card-body">
-                <form action="{{route('pessoas.store')}}" method="post" enctype="multipart/form-data">
-                    @csrf
+                <table id="consignante_master" class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Consignantes</th>
+                        <th>Consignantes Master</th>
 
 
-                    <div class="form-group">
-                        <label>Nome</label>
-                        <input class="form-control" type="text" name="nome">
-                    </div>
-                    <div class="form-group">
-                        <label>CPF</label>
-                        <input class="form-control" type="text" name="cpf">
-                    </div>
-                    <div class="form-group">
-                        <label>Matricula</label>
-                        <input placeholder="Separa matriculas por vigulas" class="form-control" type="text" name="matricula">
-                    </div>
-                    <div class="form-group">
-                        <button class="btn btn-success">Carregar</button>
-                    </div>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @forelse($averbadors as $averbador)
 
-                </form>
+                        <tr>
+                            <td>{{$averbador->name}}</td>
+                            <td>{{$averbador->consignante->name}}</td>
+
+                        </tr>
+                    @empty
+                    @endforelse
+
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-
-
-
 @stop
 
 @section('css')
@@ -102,7 +83,6 @@
 
 
 @section('js')
-    <script> console.log('Hi!'); </script>
     <script>
         $(document).on('change', 'select#consignante_master', function () {
             var consignante_master = $(this).val();
@@ -127,10 +107,12 @@
             });
         });
     </script>
+    <script> console.log('Hi!'); </script>
+
     <script>
         $(document).ready(function () {
 
-            $('#pessoas').DataTable();
+            $('#averbador').DataTable();
         });
     </script>
 @stop

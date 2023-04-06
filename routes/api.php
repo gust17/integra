@@ -17,3 +17,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::get('consignante_master/{id}',function ($id){
+    $consignante_master = \App\Models\ConsignanteMaster::find($id);
+
+
+
+    return $consignante_master->consignantes;
+});
