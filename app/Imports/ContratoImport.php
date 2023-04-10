@@ -14,7 +14,7 @@ use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 
 HeadingRowFormatter::default('none');
 
-class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading
+class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading, ShouldQueue
 
 {
     /**
@@ -41,6 +41,8 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading
     protected $valor_financiado;
     protected $total_saldo_devedor;
 
+    protected $averbador_id;
+
 
     public function __construct(
         $cpf,
@@ -57,6 +59,7 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading
         $valor_liberado,
         $valor_financiado,
         $total_saldo_devedor,
+        $averbador_id
 
     )
     {
@@ -74,6 +77,7 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading
         $this->valor_liberado = $valor_liberado;
         $this->valor_financiado = $valor_financiado;
         $this->total_saldo_devedor = $total_saldo_devedor;
+        $this->averbador_id = $averbador_id;
     }
 
     public function model(array $row)
@@ -148,6 +152,7 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading
                 'valor_total_financiado' => $valor_liberado,
                 'valor_saldo_devedor' => $valor_devedor,
                 'cod_verba' => $cod_verba,
+                'averbador_id' => $this->averbador_id
             ];
 
             //dd($grava);

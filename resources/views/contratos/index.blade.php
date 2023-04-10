@@ -3,7 +3,7 @@
 @section('title', 'Dashboard')
 
 @section('content_header')
-    <h1 class="m-0">Contratos</h1>
+    <h1 class="m-0">Contratos Consignantes</h1>
 @stop
 
 @section('content')
@@ -31,6 +31,14 @@
                         <label for="">Consignantes</label>
                         <select class="form-control consignante_master" name="consignante_id"
                                 id="consignante">
+                            <option></option>
+
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="">Averbador</label>
+                        <select class="form-control" name="averbador_id"
+                                id="averbador">
                             <option></option>
 
                         </select>
@@ -141,7 +149,7 @@
                         });
                         $('#consignante').html(options).show();
                     } else {
-                        $('#consignante').html('<option value="">Não foram encontrados bairros</option>').hide();
+                        $('#consignante').html('<option value="">Não foram encontrados Consignantes</option>').hide();
                     }
                 },
                 error: function (error) {
@@ -149,6 +157,31 @@
                 }
             });
         });
+    </script>
+    <script>
+        $(document).on('change', 'select#consignante', function () {
+            var consignante = $(this).val();
+            $.ajax({
+                url: '/api/consignante/' + consignante,
+                type: 'GET',
+                dataType: 'json',
+                success: function (dados) {
+                    if (dados.length > 0) {
+                        var options = '<option value="">Selecione o Averbador</option>';
+                        dados.forEach(function (obj) {
+                            options += '<option value="' + obj.id + '">' + obj.name + '</option>';
+                        });
+                        $('#averbador').html(options).show();
+                    } else {
+                        $('#averbador').html('<option value="">Não foram encontrados Averbadores</option>').hide();
+                    }
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+        });
+
     </script>
     <script> console.log('Hi!'); </script>
 

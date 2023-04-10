@@ -19,7 +19,7 @@ class ContratoController extends Controller
     public function index()
     {
         $consignantes_masters = ConsignanteMaster::all();
-        return view('contratos.index',compact('consignantes_masters'));
+        return view('contratos.index', compact('consignantes_masters'));
     }
 
     /**
@@ -93,12 +93,12 @@ class ContratoController extends Controller
             $request->valor_liberado,
             $request->valor_financiado,
             $request->total_saldo_devedor,
-
+            $request->averbador_id
         );
 
         //dd($pessoaImport);
         // Chame o método import e passe a instância de PessoaImport como argumento
-        Excel::import($contratoImport, $file,null,\Maatwebsite\Excel\Excel::CSV);
+        Excel::import($contratoImport, $file, null, \Maatwebsite\Excel\Excel::CSV);
     }
 
     public function importBanco(Request $request)
@@ -129,7 +129,7 @@ class ContratoController extends Controller
 
 
         // Chame o método import e passe a instância de PessoaImport como argumento
-        Excel::import($contratoImport, $file,null,\Maatwebsite\Excel\Excel::CSV);
+        Excel::import($contratoImport, $file, null, \Maatwebsite\Excel\Excel::CSV);
     }
 
     public function modal($id)
@@ -145,7 +145,7 @@ class ContratoController extends Controller
             ->with('servidor.pessoa')
             ->first(); // Obtém o primeiro contrato que pertence a um dos servidores da pessoa associada ao contrato atual e que tem o mesmo valor de parcela, mas não é o contrato atual
 
-        return [$contrato_semelhante,$contrato];
+        return [$contrato_semelhante, $contrato];
 
     }
 
