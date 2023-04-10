@@ -24,3 +24,11 @@ Route::get('consignante_master/{id}',function ($id){
 
     return $consignante_master->consignantes;
 });
+
+Route::get('consignante/{id}',function ($id){
+    $consignante_master = \App\Models\ConsignanteMaster::find($id);
+
+
+
+    return $consignante_master->consignantes;
+});
