@@ -45,6 +45,7 @@ Route::get('pessoa/import', [\App\Http\Controllers\PessoaController::class, 'cre
 Route::resource('consignante-master', \App\Http\Controllers\ConsignanteMasterController::class);
 Route::resource('consignante', \App\Http\Controllers\ConsignanteController::class);
 Route::resource('averbadors', \App\Http\Controllers\AverbadorController::class);
+Route::get('consignataria/banco/import',[\App\Http\Controllers\ContratoController::class,'banco_import']);
 
 Route::get('testeimport', function () {
     return view('teste.import');

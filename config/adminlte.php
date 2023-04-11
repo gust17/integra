@@ -346,7 +346,7 @@ return [
                 ],
                 [
                     'text' => 'Contratos/Bancos',
-                    'url' => 'consignataria/import',
+                    'url' => 'consignataria/banco/import',
                 ],
             ],
         ],

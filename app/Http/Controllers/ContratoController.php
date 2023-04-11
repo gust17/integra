@@ -6,6 +6,7 @@ use App\Imports\ContratoBancoImport;
 use App\Imports\ContratoImport;
 use App\Imports\PessoaImport;
 use App\Models\ConsignanteMaster;
+use App\Models\Consignataria;
 use App\Models\Contrato;
 use App\Models\Pessoa;
 use Illuminate\Http\Request;
@@ -20,6 +21,13 @@ class ContratoController extends Controller
     {
         $consignantes_masters = ConsignanteMaster::all();
         return view('contratos.index', compact('consignantes_masters'));
+    }
+
+    public function banco_import()
+    {
+        $consignatarias = Consignataria::all();
+
+        return view('contratos.import',compact('consignatarias'));
     }
 
     /**
