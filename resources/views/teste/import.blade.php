@@ -3,7 +3,7 @@
 @section('title', 'Consignatarias')
 
 @section('content_header')
-    <h1>Consignatarias</h1>
+    <h1>Arquivo padrao Infoconsig</h1>
 @stop
 
 @section('content')
@@ -21,8 +21,8 @@
                     <div class="col-6">
                         <label for="">Inicio</label>
                         <input name="name_inicio" type="number" class="form-control"></div>
-                    <div class="col-6">   <label for="">Termino</label> <input name="name_fim" type="number" class="form-control"></div>
-
+                    <div class="col-6"><label for="">Tamanho</label> <input name="name_tamanho" type="number"
+                                                                            class="form-control"></div>
 
 
                 </div>
@@ -33,8 +33,8 @@
                     <div class="col-6">
                         <label for="">Inicio</label>
                         <input name="name_inicio" type="number" class="form-control"></div>
-                    <div class="col-6">   <label for="">Termino</label> <input name="name_fim" type="number" class="form-control"></div>
-
+                    <div class="col-6"><label for="">Tamanho</label> <input name="name_tamanho" type="number"
+                                                                            class="form-control"></div>
 
 
                 </div>
@@ -45,8 +45,8 @@
                     <div class="col-6">
                         <label for="">Inicio</label>
                         <input name="name_inicio" type="number" class="form-control"></div>
-                    <div class="col-6">   <label for="">Termino</label> <input name="name_fim" type="number" class="form-control"></div>
-
+                    <div class="col-6"><label for="">Tamanho</label> <input name="name_tamanho" type="number"
+                                                                            class="form-control"></div>
 
 
                 </div>
@@ -71,7 +71,7 @@
     </script>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
 
             $('#consignatarias').DataTable();
             $('#bancos').select2();

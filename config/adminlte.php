@@ -296,17 +296,13 @@ return [
         // Sidebar items:
 
 
-        ['header' => 'account_settings'],
+     //   ['header' => 'account_settings'],
         [
-            'text' => 'profile',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-user',
+            'text' => 'Inicio',
+            'url' => 'home',
+            'icon' => 'fas fa-fw fa-home',
         ],
-        [
-            'text' => 'change_password',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-lock',
-        ],
+
         [
             'text' => 'Pessoas',
             'url' => 'pessoas',
