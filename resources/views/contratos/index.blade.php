@@ -15,7 +15,8 @@
                     <div class="form-group">
                         <label for="">Arquivo</label>
                         <input class="form-control" type="file" name="file">
-                    </div> <div class="form-group">
+                    </div>
+                    <div class="form-group">
                         <label for="">Consignante-Master</label>
                         <select class="form-control consignante_master" name="consignante_master_id"
                                 id="consignante_master">
@@ -124,7 +125,6 @@
         </div>
     </div>
 
-
 @stop
 
 @section('css')
@@ -167,7 +167,7 @@
                 dataType: 'json',
                 success: function (dados) {
                     if (dados.length > 0) {
-                        var options = '<option value="">Selecione o Averbador</option>';
+                        var options = '<option value="">Selecione o Aberbador</option>';
                         dados.forEach(function (obj) {
                             options += '<option value="' + obj.id + '">' + obj.name + '</option>';
                         });
@@ -184,6 +184,5 @@
 
     </script>
     <script> console.log('Hi!'); </script>
-
 
 @stop

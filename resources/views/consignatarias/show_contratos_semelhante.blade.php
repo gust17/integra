@@ -69,53 +69,53 @@
                 <div class="table-responsive">
                     <table id="contratos" class="table table-striped">
                         <thead>
-                            <tr>
-                                <th>Servidor</th>
-                                <th>Matricula Banco</th>
-                                <th>Matricula Consignante</th>
-                                <th>Valor descontado Banco</th>
-                                <th>Valor descontado Consignante</th>
-                                <th>Prazo Total Banco</th>
-                                <th>Prazo Total Consignante</th>
-                                <th>Prestação Atual Banco</th>
-                                <th>Prestação Atual Consignante</th>
-                                <th>Contrato</th>
-                                <th>Diferenças</th>
+                        <tr>
+                            <th>Servidor</th>
+                            <th>Matricula Banco</th>
+                            <th>Matricula Consignante</th>
+                            <th>Valor descontado Banco</th>
+                            <th>Valor descontado Consignante</th>
+                            <th>Prazo Total Banco</th>
+                            <th>Prazo Total Consignante</th>
+                            <th>Prestação Atual Banco</th>
+                            <th>Prestação Atual Consignante</th>
+                            <th>Contrato</th>
+                            <th>Diferenças</th>
 
 
-                            </tr>
+                        </tr>
                         </thead>
                         <tbody>
-                            @forelse($contratos as $contrato)
-                                <tr>
-                                    <td>{{ $contrato->servidor->pessoa->name }}</td>
-                                    <td>{{ $contrato->servidor->matricula }}</td>
-                                    <td>{{ $contrato->semelhante->servidor->matricula }}</td>
-                                    <td>{{ format_currency($contrato->valor_parcela) }}</td>
-                                    <td>{{ format_currency($contrato->semelhante->valor_parcela) }}</td>
-                                    <td>{{ $contrato->total_parcela }}</td>
-                                    <td>{{ $contrato->semelhante->total_parcela }}</td>
-                                    <td>{{ $contrato->n_parcela_referencia }}</td>
-                                    <td>{{ $contrato->semelhante->n_parcela_referencia }}</td>
-                                    <td>{{ $contrato->contrato }}</td>
-                                    <td>
-                                        @if ($contrato->servidor->matricula != $contrato->semelhante->servidor->matricula)
-                                            Matricula
-                                        @endif
-                                        @if ($contrato->valor_parcela != $contrato->semelhante->valor_parcela)
-                                            ,Desconto
-                                        @endif
-                                        @if ($contrato->n_parcela_referencia != $contrato->semelhante->n_parcela_referencia)
-                                            ,Parcela
-                                        @endif
-                                        @if ($contrato->total_parcela != $contrato->semelhante->total_parcela)
-                                            ,Prazo
-                                        @endif
-                                    </td>
+                        @forelse($contratos as $contrato)
+                            <tr>
+                                <td>{{ $contrato->servidor->pessoa->name }}</td>
+                                <td>{{ $contrato->servidor->matricula }}</td>
+                                <td>{{ $contrato->semelhante->servidor->matricula }}</td>
+                                <td>{{ $contrato->valor_parcela }}</td>
+                                <td>{{ $contrato->semelhante->valor_parcela}}</td>
+                                <td>{{ $contrato->total_parcela }}</td>
+                                <td>{{ $contrato->semelhante->total_parcela }}</td>
+                                <td>{{ $contrato->n_parcela_referencia }}</td>
+                                <td>{{ $contrato->semelhante->n_parcela_referencia }}</td>
+                                <td>{{ $contrato->contrato }}</td>
+                                <td>
+                                    @if ($contrato->servidor->matricula != $contrato->semelhante->servidor->matricula)
+                                        Matricula
+                                    @endif
+                                    @if ($contrato->valor_parcela != $contrato->semelhante->valor_parcela)
+                                        ,Desconto
+                                    @endif
+                                    @if ($contrato->n_parcela_referencia != $contrato->semelhante->n_parcela_referencia)
+                                        ,Parcela
+                                    @endif
+                                    @if ($contrato->total_parcela != $contrato->semelhante->total_parcela)
+                                        ,Prazo
+                                    @endif
+                                </td>
 
-                                </tr>
-                            @empty
-                            @endforelse
+                            </tr>
+                        @empty
+                        @endforelse
 
                         </tbody>
                     </table>
@@ -144,14 +144,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
 
             $('#contratos').DataTable({
+                "charset": "utf8",
                 dom: 'Bfrtip',
                 buttons: [{
-                        extend: 'csv',
-                        text: 'Exportar para CSV'
-                    },
+                    extend: 'csv',
+                    text: 'Exportar para CSV'
+                },
                     {
                         extend: 'excel',
                         text: 'Exportar para Excel'
@@ -173,13 +174,13 @@
     </script>
 
     <script>
-        $('.btnAbrirModal').click(function() {
+        $('.btnAbrirModal').click(function () {
             var id = $(this).data('id');
             $.ajax({
 
                 type: 'GET',
                 url: '/ajax-modal/' + id,
-                success: function(data) {
+                success: function (data) {
                     console.log(data)
                     if (data && data !== '') {
                         if (data[0] == null) {

@@ -33,7 +33,8 @@ class ConsignatariaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Consignataria::create($request->all());
+        return redirect()->back();
     }
 
     /**

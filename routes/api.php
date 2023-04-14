@@ -26,9 +26,9 @@ Route::get('consignante_master/{id}',function ($id){
 });
 
 Route::get('consignante/{id}',function ($id){
-    $consignante_master = \App\Models\ConsignanteMaster::find($id);
+    $consignante = \App\Models\Consignante::find($id);
 
 
 
-    return $consignante_master->consignantes;
+    return $consignante->averbadors;
 });

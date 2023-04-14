@@ -2,8 +2,10 @@
 
 namespace App\Imports;
 
+use App\Models\Averbador;
 use App\Models\Consignataria;
 use App\Models\Contrato;
+use App\Models\Pessoa;
 use App\Models\Servidor;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,7 +16,8 @@ use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 
 HeadingRowFormatter::default('none');
 
-class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading, ShouldQueue
+class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading
+    //, ShouldQueue
 
 {
     /**
@@ -82,16 +85,15 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading, Shoul
 
     public function model(array $row)
     {
-
         //dd($row);
-        $cpf = preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->cpf]);
 
+
+        $cpf = limpa_corrige_cpf($row[$this->cpf]);
+        //dd($cpf);
         $matricula = intval(preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->matricula]));
         $consignataria = str_replace(['"', '='], '', $row[$this->nm_consignataria]);
 
         $valor_parcela = floatval(str_replace(',', '.', $row[$this->valor_parcela]));
-
-        //dd($valor_parcela);
 
         if (empty($this->n_contrato)) {
             $contrato = 0;
@@ -100,11 +102,18 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading, Shoul
             $contrato = preg_replace('/[^a-zA-Z0-9\s]/', '', $this->n_contrato);
         }
 
+        if ($this->cod_verba) {
+            $cod_verba = preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->cod_verba]);
+        } else {
+            $cod_verba = 0;
+        }
 
-        $cod_verba = preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->cod_verba]);
 
         // dd($cod_verba);
         $parcela_atual = $row[$this->parcela_atual];
+        if ($parcela_atual == 0) {
+            $parcela_atual = 1;
+        }
 
         // dd($this->parcela_atual);
         $total_parcela = $row[$this->prazo_total];
@@ -112,7 +121,7 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading, Shoul
 
         $valor_liberado = $total_parcela * $valor_parcela;
 
-       // dd($valor_liberado);
+        // dd($valor_liberado);
         $valor_devedor = $valor_liberado - ($valor_parcela * $parcela_atual);
         //  dd($total_parcela);
 
@@ -131,36 +140,107 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading, Shoul
         $servidor = Servidor::where('matricula', $matricula)->first();
 
         if (!$servidor) {
-            $filename = Carbon::now()->format('d-m-Y-H-i-s') . 'servidors.txt';
-            $content = implode(',', $row) . PHP_EOL;
-            file_put_contents($filename, $content, FILE_APPEND);
-            return null;
+            $pessoa = Pessoa::where('cpf', $cpf)->first();
+            if ($pessoa) {
+                $consignante = Averbador::find($this->averbador_id)->consignante->id;
+
+                $servidor = Servidor::create([
+                    'pessoa_id' => $pessoa->id,
+                    'matricula' => $matricula,
+                    'ativo' => 0,
+                    'consignante_id' => $consignante
+                ]);
+            } else {
+                $filename = Carbon::now()->format('d-m-Y-H-i-s') . 'servidors.txt';
+                $content = implode(',', $row) . PHP_EOL;
+                file_put_contents($filename, $content, FILE_APPEND);
+                return null;
+            }
+            //
+
         }
 
-        if ($servidor->pessoa->where('cpf', $cpf)->exists()) {
-            $grava = [
-                'servidor_id' => $servidor->id,
-                'consignataria_id' => $consignataria->id,
-                'valor_parcela' => $valor_parcela,
-                'contrato' => $contrato,
-                'data_efetivacao' => null,
-                'total_parcela' => $total_parcela,
-                'n_parcela_referencia' => $parcela_atual,
-                'primeira_parcela' => null,
-                'ultima_parcela' => null,
-                'valor_liberado' => $valor_liberado,
-                'valor_total_financiado' => $valor_liberado,
-                'valor_saldo_devedor' => $valor_devedor,
-                'cod_verba' => $cod_verba,
-                'averbador_id' => $this->averbador_id
-            ];
 
-            //dd($grava);
-            return Contrato::create($grava);
+        if ($servidor->pessoa->where('cpf', $cpf)->exists()) {
+            $servidors = $servidor->pessoa->servidors->pluck('id')->toArray();
+            // dd($servidors);
+            $valor_desconto = floatval(str_replace(',', '.', $row[$this->valor_parcela]));
+            // dd($valor_desconto);
+
+            $contrato_semelhante = Contrato::whereIn('servidor_id', $servidors)
+                ->whereBetween('valor_parcela', [$valor_desconto - 1, $valor_desconto + 1])
+                ->with('servidor.pessoa')
+                ->first();
+
+
+            if ($contrato_semelhante) {
+                //dd($contrato_semelhante);
+                if ($contrato_semelhante->n_parcela_referencia == $parcela_atual && $contrato_semelhante->valor_parcela == $valor_parcela && $servidor->id == $contrato_semelhante->servidor_id) {
+                    //dd($contrato_semelhante->n_parcela_referencia, $valor_desconto, $parcela_atual);
+                    $contrato_semelhante->fill(
+
+                        [
+                            'cod_verba' => $cod_verba,
+                            'status' => 1,
+
+                        ]);
+                    $contrato_semelhante->save();
+                } else {
+                    $grava = [
+                        'servidor_id' => $servidor->id,
+                        'consignataria_id' => $consignataria->id,
+                        'valor_parcela' => $valor_parcela,
+                        'contrato' => $contrato,
+                        'data_efetivacao' => null,
+                        'total_parcela' => $total_parcela,
+                        'n_parcela_referencia' => $parcela_atual,
+                        'primeira_parcela' => null,
+                        'ultima_parcela' => null,
+                        'valor_liberado' => $valor_liberado,
+                        'valor_total_financiado' => $valor_liberado,
+                        'valor_saldo_devedor' => $valor_devedor,
+                        'cod_verba' => $cod_verba,
+                        'averbador_id' => $this->averbador_id
+                    ];
+
+                    //dd($grava);
+                    $salvarContrato = Contrato::create($grava);
+                    if ($contrato_semelhante->valor_parcela != $valor_parcela) {
+                        $contrato_semelhante->update(['valor_desconto_semelhante' => 1]);
+                    }
+                    $contrato_semelhante->update(['contrato_id' => $salvarContrato->id]);
+
+
+                }
+
+
+            } else {
+
+                $grava = [
+                    'servidor_id' => $servidor->id,
+                    'consignataria_id' => $consignataria->id,
+                    'valor_parcela' => $valor_parcela,
+                    'contrato' => $contrato,
+                    'data_efetivacao' => null,
+                    'total_parcela' => $total_parcela,
+                    'n_parcela_referencia' => $parcela_atual,
+                    'primeira_parcela' => null,
+                    'ultima_parcela' => null,
+                    'valor_liberado' => $valor_liberado,
+                    'valor_total_financiado' => $valor_liberado,
+                    'valor_saldo_devedor' => $valor_devedor,
+                    'cod_verba' => $cod_verba,
+                    'averbador_id' => $this->averbador_id
+                ];
+
+                //dd($grava);
+                return Contrato::create($grava);
+            }
+
         };
 
         echo 'oi<br>';
-        //dd($row[$this->campo2]);
+//dd($row[$this->campo2]);
 
     }
 

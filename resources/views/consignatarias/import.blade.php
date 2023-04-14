@@ -32,6 +32,27 @@
             </div>
         </div>
     </div>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Consignataria importar Manual</h3>
+            </div>
+            <div class="card-body">
+                <form action="{{route('consignatarias.store')}}" method="post" enctype="multipart/form-data">
+                    @csrf
+                    <div class="form-group">
+                        <label>Nome</label>
+                        <input class="form-control" type="text" name="name" id="">
+                    </div>
+
+                    <div class="form-group">
+                        <button class="btn btn-success">Carregar</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
 
 
 

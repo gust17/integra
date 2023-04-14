@@ -92,6 +92,26 @@ return [
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
+        'oracle' => [
+            'driver'         => 'oracle',
+            'tns'            =>  ' (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = DESKTOP-86NBAVS)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = XE)
+    )
+  )',
+            'host'           =>  'localhost',
+            'port'           =>  '1521',
+            'database'       =>  'XE',
+            'username'       =>  'infoconsig_dev',
+            'password'       =>  'infoconsig',
+            'charset'        =>  'AL32UTF8',
+            'prefix'         =>  '',
+            'prefix_schema'  =>  '',
+            'edition'        =>  'ora$base',
+            'server_version' =>  '11g',
+        ],
 
     ],
 

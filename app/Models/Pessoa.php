@@ -7,8 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pessoa extends Model
 {
+
+
     use HasFactory;
 
+ //   protected $connection = 'oracle';
+ //   protected $table = 'PESSOA';
     protected $fillable = [
         'name',
         'cpf',

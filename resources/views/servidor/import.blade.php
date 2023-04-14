@@ -13,7 +13,7 @@
                 <h3 class="card-title">Migrar com Arquivo</h3>
             </div>
             <div class="card-body">
-                <form action="{{route('pessoa.import')}}" method="post" enctype="multipart/form-data">
+                <form action="{{route('servidor.import')}}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="form-group">
                         <label for="">Consignante-Master</label>

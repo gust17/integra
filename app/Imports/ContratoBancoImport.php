@@ -24,7 +24,6 @@ class ContratoBancoImport implements ToModel, WithHeadingRow
     protected $cpf;
     protected $nome;
     protected $matricula;
-
     protected $valor_parcela;
     protected $parcela_atual;
     protected $cod_verba;
@@ -40,6 +39,8 @@ class ContratoBancoImport implements ToModel, WithHeadingRow
 
     protected $prazo_remanescente;
 
+    protected $consignante_id;
+    protected $averbador_id;
 
     public function __construct(
         $cpf,
@@ -57,7 +58,9 @@ class ContratoBancoImport implements ToModel, WithHeadingRow
         $valor_financiado,
         $total_saldo_devedor,
         $consignataria_id,
-        $prazo_remanescente
+        $prazo_remanescente,
+        $consignante_id,
+        $averbador_id
 
 
     )
@@ -79,6 +82,8 @@ class ContratoBancoImport implements ToModel, WithHeadingRow
         $this->consignataria_id = $consignataria_id;
 
         $this->prazo_remanescente = $prazo_remanescente;
+        $this->consignante_id = $consignante_id;
+        $this->averbador_id = $averbador_id;
     }
 
     public function model(array $row)
@@ -103,7 +108,14 @@ class ContratoBancoImport implements ToModel, WithHeadingRow
         $cpf = intval(preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->cpf]));
         $pessoa = Pessoa::where('cpf', $cpf)->first();
         $valor_desconto = floatval(str_replace(',', '.', $row[$this->valor_parcela]));
-        $data_contratacao = $row[$this->data_efetivacao];
+
+        if ($this->data_efetivacao) {
+
+
+            $data_contratacao = $row[$this->data_efetivacao];
+        } else {
+            $data_contratacao = Carbon::now();
+        }
         if ($this->valor_financiado) {
 
             $valor_financiado = floatval(str_replace(',', '.', $row[$this->valor_financiado]));
@@ -114,7 +126,13 @@ class ContratoBancoImport implements ToModel, WithHeadingRow
         }
 
         //dd($valor_financiado);
-        $n_contrato = intval(preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->n_contrato]));
+
+        if ($this->n_contrato) {
+            $n_contrato = intval(preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->n_contrato]));
+        } else {
+            $n_contrato = 0;
+        }
+        //dd($n_contrato);
 
         // dd($this->n_contrato);
 
@@ -134,13 +152,19 @@ class ContratoBancoImport implements ToModel, WithHeadingRow
         }
 
         $matricula = intval(preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->matricula]));
-        $nome = (preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->nome]));
+        if ($this->nome) {
+            $nome = (preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->nome]));
+
+        } else {
+            $nome = "00000000000000000";
+        }
 
         //dd($row);
 
 
-        $data_contratacao = Carbon::createFromFormat('d/m/Y', $data_contratacao);
-
+        if ($this->data_efetivacao) {
+            $data_contratacao = Carbon::createFromFormat('d/m/Y', $data_contratacao);
+        }
         //dd($data_contratacao);
 
         $valor_semelhante = null;
@@ -161,7 +185,8 @@ class ContratoBancoImport implements ToModel, WithHeadingRow
                 $servidor = Servidor::create([
                     'pessoa_id' => $pessoa->id,
                     'matricula' => $matricula,
-                    'ativo' => 0
+                    'ativo' => 0,
+                    'consignante_id' => $this->consignante_id
                 ]);
             }
 
@@ -183,14 +208,15 @@ class ContratoBancoImport implements ToModel, WithHeadingRow
                 $servidor = Servidor::create([
                     'pessoa_id' => $pessoa->id,
                     'matricula' => $matricula,
-                    'ativo' => 0
+                    'ativo' => 0,
+                    'consignante_id' => $this->consignante_id
                 ]);
             }
 
 
         }
 
-        $contrato = Contrato::where('valor_parcela', $valor_desconto)->where('servidor_id', $servidor->id)->first();
+        $contrato = Contrato::whereNot('status', 2)->where('valor_parcela', $valor_desconto)->where('servidor_id', $servidor->id)->first();
 
         //dd($contrato);
         if ($contrato) {
@@ -219,7 +245,7 @@ class ContratoBancoImport implements ToModel, WithHeadingRow
 
             //$contrato->update(
             //  []);
-
+            //dd($contrato);
             echo "tem<br>";
         } else {
             $servidors = $servidor->pessoa->servidors->pluck('id')->toArray(); // Obtém os IDs de todos os servidores da pessoa associada ao contrato
@@ -271,7 +297,8 @@ class ContratoBancoImport implements ToModel, WithHeadingRow
                     'contrato_id' => $contrato_semelhante->id,
                     'status' => 2,
                     'pessoa_existente' => $pessoa_existente,
-                    'servidor_existente' =>$servidor_existente,
+                    'servidor_existente' => $servidor_existente,
+                    'averbador_id' => $this->averbador_id
                 ];
                 return Contrato::create($grava);
                 //  dd($grava);
@@ -293,7 +320,8 @@ class ContratoBancoImport implements ToModel, WithHeadingRow
                     'cod_verba' => $cod_verba,
                     'status' => 2,
                     'pessoa_existente' => $pessoa_existente,
-                    'servidor_existente' =>$servidor_existente,
+                    'servidor_existente' => $servidor_existente,
+                    'averbador_id' => $this->averbador_id
                 ];
                 return Contrato::create($grava);
             }

@@ -25,9 +25,10 @@ class ContratoController extends Controller
 
     public function banco_import()
     {
+        $consignantes_masters = ConsignanteMaster::all();
         $consignatarias = Consignataria::all();
 
-        return view('contratos.import',compact('consignatarias'));
+        return view('contratos.import',compact('consignatarias','consignantes_masters'));
     }
 
     /**
@@ -83,7 +84,7 @@ class ContratoController extends Controller
         $file = $request->file('file');
 
         //dd($request->all());
-
+//dd($request->all());
         //dd($request->valor_parcela);
 
         $contratoImport = new ContratoImport(
@@ -132,7 +133,9 @@ class ContratoController extends Controller
             $request->valor_financiado,
             $request->total_saldo_devedor,
             $request->consignataria_id,
-            $request->prazo_remanescente
+            $request->prazo_remanescente,
+            $request->consignante_id,
+            $request->averbador_id
         );
 
 

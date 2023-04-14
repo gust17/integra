@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('home');
 });
 
 //Auth::routes(['register' => false]);
@@ -41,41 +41,62 @@ Route::get('consignatarias/{id}/sem-banco', [\App\Http\Controllers\Consignataria
 Route::post('contrato-bancos', [\App\Http\Controllers\ContratoController::class, 'importBanco'])->name('contratos.bancos');
 Route::post('consignatarias/contrato-semelhante/pesquisa', [\App\Http\Controllers\ConsignatariaController::class, 'pesquisa_semelhante'])->name('consignataria.semelhante.pesquisa');
 Route::post('pessoa-import', [\App\Http\Controllers\PessoaController::class, 'import'])->name('pessoa.import');
+Route::post('servidor-import', [\App\Http\Controllers\ServidorController::class, 'import'])->name('servidor.import');
 Route::get('pessoa/import', [\App\Http\Controllers\PessoaController::class, 'create_import']);
+Route::get('servidores/import', [\App\Http\Controllers\ServidorController::class, 'create_import']);
 Route::resource('consignante-master', \App\Http\Controllers\ConsignanteMasterController::class);
 Route::resource('consignante', \App\Http\Controllers\ConsignanteController::class);
 Route::resource('averbadors', \App\Http\Controllers\AverbadorController::class);
-Route::get('consignataria/banco/import',[\App\Http\Controllers\ContratoController::class,'banco_import']);
+Route::get('consignataria/banco/import', [\App\Http\Controllers\ContratoController::class, 'banco_import']);
 
 Route::get('testeimport', function () {
-    return view('teste.import');
+    $consignantes_masters = \App\Models\ConsignanteMaster::all();
+
+    return view('teste.import',compact('consignantes_masters'));
 });
 Route::post('testeimport', function (Request $request) {
+    //dd($request->all());
     $file = $request->file('file');
     $fileContents = $file->get();
     $lines = explode("\n", $fileContents);
 
     foreach ($lines as $line) {
-        //  89133-43260284915
-        //dd($line);
-        $matricula = intval(trim(substr($line, 0, 19)));
-        // 43260284915
-        $cpf = trim(substr($line, 20, 11));
-        //dd($cpf);
-        $pessoa = Pessoa::where('cpf', $cpf)->exists();
+
+        $matricula = intval(trim(substr($line, $request->matricula_inicio, $request->matricula_tamanho)));
+        $nome = (trim(substr($line, $request->name_inicio, $request->name_tamanho)));
+        $cpf = (trim(substr($line, $request->cpf_inicio, $request->cpf_tamanho)));
 
 
-        //dd($matricula);
-        $servidor = Servidor::where('matricula', $matricula)->exists();
-
-        $margem = trim(substr($line, 343, 15));
-        $margem = floatval(str_insert($margem, ".", -2));
-        dd($margem);
-        // dd($matricula);
+        $pessoa = Pessoa::where('cpf', $cpf)->first();
         if (!empty($pessoa)) {
             $pessoa = Pessoa::where('cpf', $cpf)->get();
 
             dd($pessoa);
+
+
+        } else {
+            dd($nome);
+        }
+
+
+        $servidor = Servidor::where('matricula', $matricula)->exists();
+
+
+        if ($servidor) {
+            $servidor = Servidor::where('matricula', $matricula)->first();
+            dd($servidor->pessoa->name, $nome);
+        } else {
+
+        }
+
+        $margem = trim(substr($line, 343, 15));
+        $margem = floatval(str_insert($margem, ".", -2));
+
+        // dd($matricula);
+        if (!empty($pessoa)) {
+            //  $pessoa = Pessoa::where('cpf', $cpf)->get();
+
+            // dd($pessoa);
             // faça alddgo com cada linha
         }
     }
@@ -87,3 +108,9 @@ Route::get('/ajax-modal/{id}', [\App\Http\Controllers\ContratoController::class,
 
 
 Route::post('importar-consignatarias', [\App\Http\Controllers\ConsignatariaController::class, 'import'])->name('consignataria.import');
+
+
+Route::get('pessoateste',function (){
+   $pessoa = Pessoa::limit(10)->get();
+   dd($pessoa);
+});

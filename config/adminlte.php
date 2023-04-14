@@ -296,11 +296,25 @@ return [
         // Sidebar items:
 
 
-     //   ['header' => 'account_settings'],
+        //   ['header' => 'account_settings'],
         [
             'text' => 'Inicio',
             'url' => 'home',
             'icon' => 'fas fa-fw fa-home',
+        ],
+        [
+            'text' => 'Consignante Master',
+            'url' => 'consignante-master',
+            'icon' => 'fas fa-fw fa-lock',
+        ], [
+            'text' => 'Consignante',
+            'url' => 'consignante',
+            'icon' => 'fas fa-fw fa-building',
+        ],
+        [
+            'text' => 'Consignatarias',
+            'url' => 'consignatarias',
+            'icon' => 'fas fa-fw fa-building',
         ],
 
         [
@@ -308,26 +322,13 @@ return [
             'url' => 'pessoas',
             'icon' => 'fas fa-fw fa-users',
         ],
-        [
-            'text' => 'Consignatarias',
-            'url' => 'consignatarias',
-            'icon' => 'fas fa-fw fa-building',
-        ],
-        [
-            'text' => 'Consignante',
-            'url' => 'consignante',
-            'icon' => 'fas fa-fw fa-building',
-        ],
+
         [
             'text' => 'Averbador',
             'url' => 'averbadors',
             'icon' => 'fas fa-fw fa-building',
         ],
-        [
-            'text' => 'Consignante Master',
-            'url' => 'consignante-master',
-            'icon' => 'fas fa-fw fa-lock',
-        ],
+
         [
             'text' => 'Migrações',
             'icon' => 'fas fa-fw fa-cogs',
@@ -339,6 +340,10 @@ return [
                 [
                     'text' => 'Pessoas/Servidores',
                     'url' => 'pessoa/import',
+                ],
+                [
+                    'text' => 'Servidores',
+                    'url' => 'servidores/import',
                 ],
                 [
                     'text' => 'Contratos/Prefeitura',
