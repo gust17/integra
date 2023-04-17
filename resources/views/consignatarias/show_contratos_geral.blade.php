@@ -23,6 +23,7 @@
                             <th>Prazo Total</th>
                             <th>Prestação Atual</th>
                             <th>Contrato</th>
+                            <th>OBS</th>
 
 
                         </tr>
@@ -39,6 +40,7 @@
                                 <td>{{$contrato->total_parcela}}</td>
                                 <td>{{$contrato->n_parcela_referencia}}</td>
                                 <td>{{$contrato->contrato}}</td>
+                                <td>{{$contrato->obs}}</td>
 
 
                             </tr>

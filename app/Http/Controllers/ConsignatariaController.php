@@ -98,7 +98,7 @@ class ConsignatariaController extends Controller
     public function validada($id)
     {
         $consignataria = Consignataria::find($id);
-        $contratos = $consignataria->contratos->where('status', 1);
+        $contratos = $consignataria->contratos->where('status', 1)->where('obs',null);
 
         return view('consignatarias.show_contratos_validados', compact('contratos', 'consignataria'));
 
@@ -135,17 +135,32 @@ class ConsignatariaController extends Controller
     {
         $consignataria = Consignataria::find($id);
 
-        $contratos = $consignataria->contratos->whereNotNull('contrato_id');
+        $contratos = $consignataria->contratos->whereNotNull('contrato_id')->whereNull('obs');
         $title = "Semelhantes";
         return view('consignatarias.show_contratos_semelhante', compact('contratos', 'consignataria', 'title'));
+    }
+    public function obs($id)
+    {
+        $consignataria = Consignataria::find($id);
+
+        $contratos = $consignataria->contratos->whereNotNull('obs');
+        $title = "Com Observação";
+        return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title'));
+    }
+    public function sem_prefeitura($id)
+    {
+        $consignataria = Consignataria::find($id);
+
+        $contratos = $consignataria->contratos->where('origem',1)->where('status','!=',1);
+        $title = "Não encontrados na prefeitura";
+        return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title'));
     }
 
     public function sem_banco($id)
     {
         $consignataria = Consignataria::find($id);
-        $id_reterirar_consulta = $consignataria->contratos->whereNotNull('contrato_id')->pluck('contrato_id')->toArray();
-        $contratos = $consignataria->contratos->where('contrato', 0)->whereNotIn('id', $id_reterirar_consulta);
-        $title = "não encontrados no Arquivo do banco";
+        $contratos = $consignataria->contratos->where('origem',0)->where('status','!=',1)->whereNull('obs');
+        $title = "Não encontrados no Arquivo do banco";
         return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title'));
 
     }

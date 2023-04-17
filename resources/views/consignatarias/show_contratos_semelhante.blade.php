@@ -80,6 +80,7 @@
                             <th>Prestação Atual Banco</th>
                             <th>Prestação Atual Consignante</th>
                             <th>Contrato</th>
+                            <th>Contrato</th>
                             <th>Diferenças</th>
 
 
@@ -98,6 +99,7 @@
                                 <td>{{ $contrato->n_parcela_referencia }}</td>
                                 <td>{{ $contrato->semelhante->n_parcela_referencia }}</td>
                                 <td>{{ $contrato->contrato }}</td>
+                                <td>{{ $contrato->semelhante->contrato }}</td>
                                 <td>
                                     @if ($contrato->servidor->matricula != $contrato->semelhante->servidor->matricula)
                                         Matricula

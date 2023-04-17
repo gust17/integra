@@ -17,6 +17,22 @@
                         <input class="form-control" type="file" name="file">
                     </div>
                     <div class="form-group">
+                        <label>Linha do Cabeçalho</label>
+                        <input class="form-control" name="inicio" type="number">
+                    </div>
+                    <div class="form-group">
+                        <label for="">Consignataria</label>
+                        <select class="form-control" name="consignantaria_id" id="">
+                            <option value=""></option>
+                            @forelse($consignatarias as $consignataria)
+                                <option value="{{$consignataria->id}}">{{$consignataria->name}}</option>
+
+                            @empty
+                            @endforelse
+                        </select>
+                    </div>
+
+                    <div class="form-group">
                         <label for="">Consignante-Master</label>
                         <select class="form-control consignante_master" name="consignante_master_id"
                                 id="consignante_master">
@@ -55,11 +71,11 @@
                             <label>Coluna com Matriculas</label>
                             <input class="form-control" type="text" name="matricula">
                         </div>
-
                         <div class="form-group col-md-3">
-                            <label>Coluna com Consignatarias</label>
-                            <input class="form-control" type="text" name="nm_consignataria">
+                            <label>Coluna com Nome</label>
+                            <input class="form-control" type="text" name="nome">
                         </div>
+
                         <div class="form-group col-md-3">
                             <label>Coluna com Valor Parcela</label>
                             <input class="form-control" type="text" name="valor_parcela">
@@ -112,6 +128,14 @@
                         <div class="form-group col-md-3">
                             <label>Coluna com Valor Total Devedor</label>
                             <input class="form-control" type="text" name="total_saldo_devedor">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>Coluna com Prazo Remanescente</label>
+                            <input class="form-control" type="text" name="prazo_remanescente">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>Coluna com Observações</label>
+                            <input class="form-control" type="text" name="obs">
                         </div>
 
                     </div>

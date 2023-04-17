@@ -35,6 +35,9 @@ Route::get('consignataria/import', [\App\Http\Controllers\ConsignatariaControlle
 Route::get('consignatarias/{id}/nao-validadas', [\App\Http\Controllers\ConsignatariaController::class, 'naovalidada'])->name('consignataria.naovalidada');
 Route::get('consignatarias/{id}/contratos_sem_pessoa', [\App\Http\Controllers\ConsignatariaController::class, 'sem_pessoa'])->name('consignataria.sem_pessoa');
 Route::get('consignatarias/{id}/contratos_sem_servidor', [\App\Http\Controllers\ConsignatariaController::class, 'sem_servidor'])->name('consignataria.sem_servidor');
+Route::get('consignatarias/{id}/sem_prefeitura', [\App\Http\Controllers\ConsignatariaController::class, 'sem_prefeitura'])->name('consignataria.sem_prefeitura');
+Route::get('consignatarias/{id}/sem_banco', [\App\Http\Controllers\ConsignatariaController::class, 'sem_banco'])->name('consignataria.sem_banco');
+Route::get('consignatarias/{id}/obs', [\App\Http\Controllers\ConsignatariaController::class, 'obs'])->name('consignataria.obs');
 Route::get('consignatarias/{id}/novo-contrato', [\App\Http\Controllers\ConsignatariaController::class, 'novo_contrato'])->name('consignataria.novo-contrato');
 Route::get('consignatarias/{id}/semelhantes', [\App\Http\Controllers\ConsignatariaController::class, 'semelhante'])->name('consignataria.semelhante');
 Route::get('consignatarias/{id}/sem-banco', [\App\Http\Controllers\ConsignatariaController::class, 'sem_banco'])->name('consignataria.sem_banco');
@@ -111,6 +114,15 @@ Route::post('importar-consignatarias', [\App\Http\Controllers\ConsignatariaContr
 
 
 Route::get('pessoateste',function (){
-   $pessoa = Pessoa::limit(10)->get();
-   dd($pessoa);
+  $contratos = \App\Models\Contrato::all();
+
+  //dd($contratos->toArray());
+  foreach ($contratos as $contrato){
+      $contrato->delete();
+     // $contrato->fill(['origem' => 0]);
+    //  $contrato->save();
+
+
+
+  }
 });

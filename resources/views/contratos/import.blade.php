@@ -52,6 +52,10 @@
                         </select>
 
                     </div>
+                    <div class="form-group">
+                        <label>Linha do Cabeçalho</label>
+                        <input class="form-control" name="inicio" type="number">
+                    </div>
 
                     <div class="form-group">
                         <label for="">Arquivo</label>

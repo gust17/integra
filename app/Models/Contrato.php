@@ -33,7 +33,8 @@ class Contrato extends Model
         'pessoa_existente',
         'servidor_existente',
         'contrato_id',
-        'averbador_id'
+        'averbador_id',
+        'origem'
     ];
 
     public function servidor()
@@ -48,7 +49,7 @@ class Contrato extends Model
 
     public function semelhante()
     {
-        return $this->belongsTo(Contrato::class,'contrato_id','id');
+        return $this->belongsTo(Contrato::class, 'contrato_id', 'id');
     }
 
     public function getSemelhante($id)
@@ -66,6 +67,15 @@ class Contrato extends Model
 
         return $contrato_semelhante;
 
+    }
+
+    public function getOrigemFormatted()
+    {
+        if ($this->attributes['origem'] == 0) {
+            return "Prefeitura";
+        } else {
+            return "Banco";
+        }
     }
 
 

@@ -12,6 +12,7 @@ use App\Models\Pessoa;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
+
 class ContratoController extends Controller
 {
     /**
@@ -19,8 +20,9 @@ class ContratoController extends Controller
      */
     public function index()
     {
+        $consignatarias = Consignataria::all();
         $consignantes_masters = ConsignanteMaster::all();
-        return view('contratos.index', compact('consignantes_masters'));
+        return view('contratos.index', compact('consignantes_masters', 'consignatarias'));
     }
 
     public function banco_import()
@@ -28,7 +30,7 @@ class ContratoController extends Controller
         $consignantes_masters = ConsignanteMaster::all();
         $consignatarias = Consignataria::all();
 
-        return view('contratos.import',compact('consignatarias','consignantes_masters'));
+        return view('contratos.import', compact('consignatarias', 'consignantes_masters'));
     }
 
     /**
@@ -82,15 +84,10 @@ class ContratoController extends Controller
     public function import(Request $request)
     {
         $file = $request->file('file');
-
         //dd($request->all());
-//dd($request->all());
-        //dd($request->valor_parcela);
-
         $contratoImport = new ContratoImport(
             $request->cpf,
             $request->matricula,
-            $request->nm_consignataria,
             $request->valor_parcela,
             $request->parcela_atual,
             $request->cod_verba,
@@ -102,20 +99,21 @@ class ContratoController extends Controller
             $request->valor_liberado,
             $request->valor_financiado,
             $request->total_saldo_devedor,
-            $request->averbador_id
+            $request->averbador_id,
+            $request->prazo_remanescente,
+            $request->consignante_id,
+            $request->inicio,
+            $request->obs,
+            $request->nome,
+            $request->consignantaria_id,
         );
 
-        //dd($pessoaImport);
-        // Chame o método import e passe a instância de PessoaImport como argumento
         Excel::import($contratoImport, $file, null, \Maatwebsite\Excel\Excel::CSV);
     }
 
     public function importBanco(Request $request)
     {
         $file = $request->file('file');
-
-        //dd($request->all());
-
 
         $contratoImport = new ContratoBancoImport(
             $request->cpf,
@@ -135,12 +133,19 @@ class ContratoController extends Controller
             $request->consignataria_id,
             $request->prazo_remanescente,
             $request->consignante_id,
-            $request->averbador_id
+            $request->averbador_id,
+            $request->inicio
         );
 
 
-        // Chame o método import e passe a instância de PessoaImport como argumento
-        Excel::import($contratoImport, $file, null, \Maatwebsite\Excel\Excel::CSV);
+
+        Excel::import($contratoImport, $file, null, \Maatwebsite\Excel\Excel::CSV, [
+            'ignoreEmpty' => true,
+            'ignoreEmptyRowAndColumn' => true,
+            'headingRow' => 66
+
+        ]);
+
     }
 
     public function modal($id)

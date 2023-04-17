@@ -18,6 +18,7 @@
                         <thead>
                         <tr>
                             <th>Servidor</th>
+                            <th>cpf</th>
                             <th>Matricula</th>
                             <th>Valor descontado</th>
                             <th>Prazo Total</th>
@@ -34,6 +35,7 @@
 
                             @if($contrato->status == 2 ) style="background-color: #ffdf7e" @endif>
                                 <td>{{$contrato->servidor->pessoa->name}}</td>
+                                <td>{{$contrato->servidor->pessoa->cpf}}</td>
                                 <td>{{$contrato->servidor->matricula}}</td>
                                 <td>{{format_currency($contrato->valor_parcela)}}</td>
                                 <td>{{$contrato->total_parcela}}</td>

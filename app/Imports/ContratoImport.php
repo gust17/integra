@@ -11,12 +11,14 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithGroupedHeadingRow;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 
 HeadingRowFormatter::default('none');
 
-class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading
+class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading, WithGroupedHeadingRow, WithStartRow
     //, ShouldQueue
 
 {
@@ -47,10 +49,12 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading
     protected $averbador_id;
 
 
+    protected $nome;
+
+
     public function __construct(
         $cpf,
         $matricula,
-        $nm_consignataria,
         $valor_parcela,
         $parcela_atual,
         $cod_verba,
@@ -62,13 +66,18 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading
         $valor_liberado,
         $valor_financiado,
         $total_saldo_devedor,
-        $averbador_id
+        $averbador_id,
+        $prazo_remanescente,
+        $consignante_id,
+        $inicio,
+        $obs,
+        $nome,
+        $consignantaria_id
 
     )
     {
         $this->cpf = $cpf;
         $this->matricula = $matricula;
-        $this->nm_consignataria = $nm_consignataria;
         $this->valor_parcela = $valor_parcela;
         $this->parcela_atual = $parcela_atual;
         $this->cod_verba = $cod_verba;
@@ -81,25 +90,34 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading
         $this->valor_financiado = $valor_financiado;
         $this->total_saldo_devedor = $total_saldo_devedor;
         $this->averbador_id = $averbador_id;
+        $this->prazo_remanescente = $prazo_remanescente;
+        $this->consignante_id = $consignante_id;
+        $this->inicio = $inicio;
+        $this->obs = $obs;
+        $this->nome = $nome;
+        $this->consignantaria_id = $consignantaria_id;
     }
 
     public function model(array $row)
     {
+
+
         //dd($row);
-
-
         $cpf = limpa_corrige_cpf($row[$this->cpf]);
-        //dd($cpf);
-        $matricula = intval(preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->matricula]));
-        $consignataria = str_replace(['"', '='], '', $row[$this->nm_consignataria]);
+        $nome = $row[$this->nome];
 
-        $valor_parcela = floatval(str_replace(',', '.', $row[$this->valor_parcela]));
+        $matricula = intval(preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->matricula]));
+
+
+        $obs = $row[$this->obs];
+        $valor_parcela = floatval(str_replace(",", ".", str_replace("R$ ", "", $row[$this->valor_parcela])));
 
         if (empty($this->n_contrato)) {
             $contrato = 0;
 
         } else {
-            $contrato = preg_replace('/[^a-zA-Z0-9\s]/', '', $this->n_contrato);
+            $contrato = preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->n_contrato]);
+
         }
 
         if ($this->cod_verba) {
@@ -107,13 +125,18 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading
         } else {
             $cod_verba = 0;
         }
-
+        // dd($contrato);
 
         // dd($cod_verba);
-        $parcela_atual = $row[$this->parcela_atual];
-        if ($parcela_atual == 0) {
-            $parcela_atual = 1;
+        if ($this->parcela_atual) {
+            $parcela_atual = $row[$this->parcela_atual];
+            if ($parcela_atual == 0) {
+                $parcela_atual = 1;
+            }
+        } else {
+            $parcela_atual = $row[$this->prazo_remanescente] + 1;
         }
+        //dd($parcela_atual);
 
         // dd($this->parcela_atual);
         $total_parcela = $row[$this->prazo_total];
@@ -126,18 +149,19 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading
         //  dd($total_parcela);
 
         //dd($valor_parcela);
-        $consignataria = Consignataria::where('name', $consignataria)->first();
+        $consignataria = Consignataria::find($this->consignantaria_id);
+
 
         if (!$consignataria) {
             $filename = Carbon::now()->format('d-m-Y-H-i-s') . 'contratos.txt';
-            $content = implode(',', $row) . PHP_EOL;
+            $content = implode(',', array_map('strval', $row)) . PHP_EOL;
             file_put_contents($filename, $content, FILE_APPEND);
             return null;
         }
-        // dd($consignataria);
-        // dd($consignataria);
+
 
         $servidor = Servidor::where('matricula', $matricula)->first();
+
 
         if (!$servidor) {
             $pessoa = Pessoa::where('cpf', $cpf)->first();
@@ -148,20 +172,36 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading
                     'pessoa_id' => $pessoa->id,
                     'matricula' => $matricula,
                     'ativo' => 0,
-                    'consignante_id' => $consignante
+                    'consignante_id' => $this->consignante_id
                 ]);
             } else {
-                $filename = Carbon::now()->format('d-m-Y-H-i-s') . 'servidors.txt';
-                $content = implode(',', $row) . PHP_EOL;
-                file_put_contents($filename, $content, FILE_APPEND);
-                return null;
+
+
+                //$filename = Carbon::now()->format('d-m-Y-H-i-s') . 'servidors.txt';
+                // /$content = implode(',', array_map('strval', $row)) . PHP_EOL;
+                //file_put_contents($filename, $content, FILE_APPEND);
+                //return null;
+
+
             }
             //
 
         }
-
+        if ($servidor == null) {
+            $pessoa = Pessoa::where('cpf', $cpf)->first();
+            if (!$pessoa) {
+                $pessoa = Pessoa::create(['name' => $nome, 'cpf' => $cpf, 'ativo' => 0]);
+                $servidor = Servidor::create([
+                    'pessoa_id' => $pessoa->id,
+                    'matricula' => $matricula,
+                    'ativo' => 0,
+                    'consignante_id' => $this->consignante_id
+                ]);
+            }
+        }
 
         if ($servidor->pessoa->where('cpf', $cpf)->exists()) {
+
             $servidors = $servidor->pessoa->servidors->pluck('id')->toArray();
             // dd($servidors);
             $valor_desconto = floatval(str_replace(',', '.', $row[$this->valor_parcela]));
@@ -170,7 +210,7 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading
             $contrato_semelhante = Contrato::whereIn('servidor_id', $servidors)
                 ->whereBetween('valor_parcela', [$valor_desconto - 1, $valor_desconto + 1])
                 ->with('servidor.pessoa')
-                ->first();
+                ->where('origem', 1)->first();
 
 
             if ($contrato_semelhante) {
@@ -200,7 +240,9 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading
                         'valor_total_financiado' => $valor_liberado,
                         'valor_saldo_devedor' => $valor_devedor,
                         'cod_verba' => $cod_verba,
-                        'averbador_id' => $this->averbador_id
+                        'averbador_id' => $this->averbador_id,
+                        'obs' => $obs,
+                        'origem' => 0
                     ];
 
                     //dd($grava);
@@ -230,7 +272,9 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading
                     'valor_total_financiado' => $valor_liberado,
                     'valor_saldo_devedor' => $valor_devedor,
                     'cod_verba' => $cod_verba,
-                    'averbador_id' => $this->averbador_id
+                    'averbador_id' => $this->averbador_id,
+                    'obs' => $obs,
+                    'origem' => 0
                 ];
 
                 //dd($grava);
@@ -250,4 +294,16 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading
         return 1000;
         // TODO: Implement chunkSize() method.
     }
+
+    public function startRow(): int
+    {
+        return $this->inicio + 1;
+        // TODO: Implement startRow() method.
+    }
+
+    public function headingRow(): int
+    {
+        return $this->inicio;
+    }
+
 }
