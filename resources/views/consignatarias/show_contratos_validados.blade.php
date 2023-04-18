@@ -22,7 +22,7 @@
                             <th>Matricula</th>
                             <th>Valor descontado</th>
                             <th>Prazo Total</th>
-                            <th>Prestação Atual</th>
+                            <th>Prestacao Atual</th>
                             <th>Contrato</th>
 
 
@@ -37,7 +37,7 @@
                                 <td>{{$contrato->servidor->pessoa->name}}</td>
                                 <td>{{$contrato->servidor->pessoa->cpf}}</td>
                                 <td>{{$contrato->servidor->matricula}}</td>
-                                <td>{{format_currency($contrato->valor_parcela)}}</td>
+                                <td>{{($contrato->valor_parcela)}}</td>
                                 <td>{{$contrato->total_parcela}}</td>
                                 <td>{{$contrato->n_parcela_referencia}}</td>
                                 <td>{{$contrato->contrato}}</td>
@@ -74,7 +74,27 @@
     <script>
         $(document).ready(function () {
 
-            $('#contratos').DataTable();
+            $('#contratos').DataTable({
+                "charset": "utf8",
+                dom: 'Bfrtip',
+                buttons: [{
+                    extend: 'csv',
+                    text: 'Exportar para CSV'
+                },
+                    {
+                        extend: 'excel',
+                        text: 'Exportar para Excel'
+                    },
+                    {
+                        extend: 'pdf',
+                        orientation: 'landscape',
+                        text: 'Exportar para PDF'
+                    },
+                    'print',
+
+                ],
+
+            });
 
 
             $('#bancos').select2();

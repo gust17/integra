@@ -69,12 +69,12 @@ class Contrato extends Model
 
     }
 
-    public function getOrigemFormatted()
+    public function getNovaOrigem()
     {
-        if ($this->attributes['origem'] == 0) {
-            return "Prefeitura";
-        } else {
-            return "Banco";
+        if ($this->attributes['origem'] == 0){
+            return 'Prefeitura';
+        }else{
+            return  'Banco';
         }
     }
 

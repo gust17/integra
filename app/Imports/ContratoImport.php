@@ -102,7 +102,9 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading, WithG
     {
 
 
-        //dd($row);
+        //dd($row[$this->parcela_atual]);
+
+
         $cpf = limpa_corrige_cpf($row[$this->cpf]);
         $nome = $row[$this->nome];
 
@@ -110,8 +112,11 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading, WithG
 
 
         $obs = $row[$this->obs];
-        $valor_parcela = floatval(str_replace(",", ".", str_replace("R$ ", "", $row[$this->valor_parcela])));
+        $valor_parcela = corrige_dinheiro($row[$this->valor_parcela]);
 
+       // dd($valor_parcela);
+
+        // dd($valor_parcela);
         if (empty($this->n_contrato)) {
             $contrato = 0;
 
@@ -129,16 +134,14 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading, WithG
 
         // dd($cod_verba);
         if ($this->parcela_atual) {
-            $parcela_atual = $row[$this->parcela_atual];
+            $parcela_atual = valida_parcela($row[$this->parcela_atual]);
             if ($parcela_atual == 0) {
                 $parcela_atual = 1;
             }
         } else {
-            $parcela_atual = $row[$this->prazo_remanescente] + 1;
+            $parcela_atual = $row[$this->prazo_total] - $row[$this->prazo_remanescente] + 1;
         }
-        //dd($parcela_atual);
 
-        // dd($this->parcela_atual);
         $total_parcela = $row[$this->prazo_total];
 
 

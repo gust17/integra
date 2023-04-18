@@ -73,7 +73,7 @@
                     <tbody>
                     <tr>
                         <td>Validados</td>
-                        <td>{{$contratos->where('status',1)->count()}}</td>
+                        <td>{{$contratos->where('status',1)->whereNull('obs')->count()}}</td>
                         <td>
                             <a href="{{route('consignataria.validada',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
                         </td>
@@ -81,17 +81,18 @@
                     </tr>
                     <tr>
                         <td>Não Validados</td>
-                        <td>{{$contratos->where('status','!=',1)->whereNull('obs')->whereNull('contrato_id')->count()}}</td>
+                        <td>{{$naovalidados->count()}}</td>
                         <td>
                             <a href="{{route('consignataria.naovalidada',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
                         </td>
 
                     </tr>
                     <tr>
-                        <td>Contratos com  Inexistentes/Divergentes</td>
+                        <td>Contratos com Inexistentes/Divergentes</td>
                         <td>{{$contratosSemServidor->count()}}</td>
                         <td>
-                            <a href="{{route('consignataria.sem_servidor',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
+                            <a href="{{route('consignataria.sem_servidor',$consignataria->id)}}"
+                               class="btn btn-primary">Visualizar</a>
                         </td>
 
                     </tr>
@@ -106,7 +107,8 @@
                         <td>Possiveis Renegociações/Novos Contratos</td>
                         <td>{{$possivelRenegociacao->count()}}</td>
                         <td>
-                            <a href="{{route('consignataria.novo-contrato',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
+                            <a href="{{route('consignataria.novo-contrato',$consignataria->id)}}"
+                               class="btn btn-primary">Visualizar</a>
                         </td>
                     </tr>
 
@@ -130,7 +132,8 @@
                         <td>Contratos não Encontrados na Prefeitura</td>
                         <td>{{$contratos->where('origem',1)->where('status','!=',1)->count()}}</td>
                         <td>
-                            <a href="{{route('consignataria.sem_prefeitura',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
+                            <a href="{{route('consignataria.sem_prefeitura',$consignataria->id)}}"
+                               class="btn btn-primary">Visualizar</a>
                         </td>
 
                     </tr>
@@ -146,7 +149,7 @@
                     <tr>
                         <td>Total de contratos do arquivo</td>
                         <td>{{$contratos->count()}}</td>
-<td></td>
+                        <td></td>
                     </tr>
                     </tbody>
                 </table>
@@ -167,7 +170,7 @@
                             <th>Prazo Total</th>
                             <th>Prestação Atual</th>
                             <th>Contrato</th>
-<th>Origem</th>
+                            <th>Origem</th>
                             <th>Erros</th>
                         </tr>
                         </thead>
@@ -179,11 +182,11 @@
                             @if($contrato->status == 2 ) style="background-color: #ffdf7e" @endif>
                                 <td>{{$contrato->servidor->pessoa->name}}</td>
                                 <td>{{$contrato->servidor->matricula}}</td>
-                                <td>{{format_currency($contrato->valor_parcela)}}</td>
+                                <td>{{($contrato->valor_parcela)}}</td>
                                 <td>{{$contrato->total_parcela}}</td>
                                 <td>{{$contrato->n_parcela_referencia}}</td>
                                 <td>{{$contrato->contrato}}</td>
-                                <td>{{$contrato->origem}}</td>
+                                <td>{{$contrato->getNovaOrigem()}}</td>
 
                                 <td>
 

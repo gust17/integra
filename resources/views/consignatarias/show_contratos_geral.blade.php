@@ -23,6 +23,7 @@
                             <th>Prazo Total</th>
                             <th>Prestação Atual</th>
                             <th>Contrato</th>
+                            <th>Origem</th>
                             <th>OBS</th>
 
 
@@ -40,6 +41,7 @@
                                 <td>{{$contrato->total_parcela}}</td>
                                 <td>{{$contrato->n_parcela_referencia}}</td>
                                 <td>{{$contrato->contrato}}</td>
+                                <td>{{$contrato->getNovaOrigem()}}</td>
                                 <td>{{$contrato->obs}}</td>
 
 
@@ -74,7 +76,29 @@
     <script>
         $(document).ready(function () {
 
-            $('#contratos').DataTable();
+            $('#contratos').DataTable(
+                {
+                    "charset": "utf8",
+                    dom: 'Bfrtip',
+                    buttons: [{
+                        extend: 'csv',
+                        text: 'Exportar para CSV'
+                    },
+                        {
+                            extend: 'excel',
+                            text: 'Exportar para Excel'
+                        },
+                        {
+                            extend: 'pdf',
+                            orientation: 'landscape',
+                            text: 'Exportar para PDF'
+                        },
+                        'print',
+
+                    ],
+
+                }
+            );
 
 
             $('#bancos').select2();

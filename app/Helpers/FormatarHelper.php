@@ -1,5 +1,7 @@
 <?php
 
+use Carbon\Carbon;
+
 
 if (!function_exists('format_currency')) {
     function format_currency($value, $currencyCode = 'BRL')
@@ -28,8 +30,9 @@ if (!function_exists('str_insert')) {
     }
 }
 
-if (!function_exists('limpa_corrige_cpf')){
-    function limpa_corrige_cpf($value){
+if (!function_exists('limpa_corrige_cpf')) {
+    function limpa_corrige_cpf($value)
+    {
 
         //dd($value);
         $cpf = preg_replace('/[^a-zA-Z0-9\s]/', '', $value);
@@ -38,3 +41,108 @@ if (!function_exists('limpa_corrige_cpf')){
         return $cpf;
     }
 }
+
+
+if (!function_exists('validada_parcela')) {
+    function valida_parcela($value)
+    {
+        // Verificar se o valor contém uma barra "/"
+        if (strpos($value, '/') !== false) {
+            // Dividir a string em um array com base no caractere "/"
+            $array = explode('/', $value);
+
+            // Obter o primeiro elemento do array, que é o valor antes da barra "/"
+            $valor = array_shift($array);
+
+            // Imprimir o valor para fins de depuração
+            //dd($valor);
+
+            // Retornar o valor antes da barra "/"
+            return intval($valor);
+        } else {
+            // Se o valor não contiver uma barra "/", exibir o valor original
+
+
+            // Retornar o valor original
+            return intval($value);
+        }
+    }
+
+}
+
+
+if (!function_exists('corrige_dinheiro')) {
+    function corrige_dinheiro($value)
+    {
+
+        //dd($value);
+        $string = str_replace("R$ ", "", $value); // remove "R$ "
+
+//        $valor_em_float = floatval(str_replace(',', '.', str_replace('.', '', substr($value, 3))));
+        $string = str_replace(".", "", $string); // substitui ponto por espaço
+
+        $string = str_replace(",", ".", $string);
+
+        return floatval($string);
+    }
+
+}
+
+if (!function_exists('corrige_dinheiro2')) {
+    function corrige_dinheiro2($value)
+    {
+
+
+        $string = str_replace(".", "", $value); // substitui ponto por espaço
+        $string = str_replace(",", ".", $string);
+
+        //$valor_em_float = floatval(str_replace(',', '.', str_replace('.', '', substr($value, 3))));
+
+        return floatval($string);
+    }
+
+}
+
+if (!function_exists('valida_data')) {
+    function valida_data($value)
+    {
+        // Verificar se o valor contém uma barra "/"
+        if ($value) {
+            $data_carbon = Carbon::createFromFormat('d/m/Y', $value);
+            return $data_carbon;
+        } else {
+            return \Carbon\Carbon::now();
+        }
+    }
+
+}
+
+if (!function_exists('valida_contrato')) {
+    function valida_contrato($value)
+    {
+
+
+        if ($value) {
+            $valor = preg_replace('/[^a-zA-Z0-9\s]/', '', $value);
+            return $valor;
+        } else {
+            return 0;
+        }
+
+
+    }
+
+}
+if (!function_exists('valida_nome')) {
+    function valida_nome($value)
+    {
+        if ($value) {
+            $nome = (preg_replace('/[^a-zA-Z0-9\s]/', '', $value));
+
+        } else {
+            $nome = "00000000000000000";
+        }
+        return $nome;
+    }
+}
+
