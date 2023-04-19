@@ -48,13 +48,24 @@ class ConsignatariaController extends Controller
         $sem_servidor_pessoa_ativa = Servidor::whereNotIn('pessoa_id', $pessoa_inativa)->where('ativo', 0)->pluck('id')->toArray();
         $contratosSemServidor = $contratos->whereIn('servidor_id', $sem_servidor_pessoa_ativa);
         $contratosSemPessoa = $contratos->whereIn('servidor_id', $sem_servidor_pessoa_inativa);
-        $possivelRenegociacao = $contratos->where('n_parcela_referencia', 1);
+
+        $id_reterirar_consulta = $consignataria->contratos->whereNotNull('contrato_id')->pluck('contrato_id')->toArray();
+        $possivelRenegociacao = $contratos->where('n_parcela_referencia', 1)->whereNull('contrato_id')->whereNotIn('id',$id_reterirar_consulta);
         $contratos_semelhantes = $contratos->whereNotNull('contrato_id')->whereNull('obs');
 
-        $naovalidados = $contratos->where('status',"!=",1)->whereNull('obs')->whereNull('contrato_id')->whereNotIn('id', $contratos_semelhantes->pluck('contrato_id')->toArray());
 
 
-        return view('consignatarias.show_contratos', compact('contratos', 'consignataria', 'contratosSemServidor', 'contratosSemPessoa', 'possivelRenegociacao', 'contratos_semelhantes','naovalidados'));
+        $naovalidados = $contratos->where('status',"!=",1)->whereNull('obs')->whereNull('contrato_id')->whereNotIn('id', $contratos_semelhantes->pluck('contrato_id')->toArray())->where('n_parcela_referencia','!=',1);
+
+
+
+        $sem_banco = $contratos->where('origem',0)->whereNull('obs')->where('status','!=',1)->whereNotIn('id', $contratos_semelhantes->pluck('contrato_id'))->where('n_parcela_referencia',1)->count();
+
+       // dd($sem_banco);
+        $sem_prefeitura = $contratos->where('origem',1)->whereNull('obs')->whereNull('contrato_id')->where('n_parcela_referencia','=!',1)->count();
+        //dd($sem_prefeitura);
+       // dd($sem_banco);
+        return view('consignatarias.show_contratos', compact('contratos', 'consignataria', 'contratosSemServidor', 'contratosSemPessoa', 'possivelRenegociacao', 'contratos_semelhantes','naovalidados','sem_banco','sem_prefeitura'));
         //
     }
 
@@ -109,7 +120,11 @@ class ConsignatariaController extends Controller
     public function naovalidada($id)
     {
         $consignataria = Consignataria::find($id);
-        $contratos = $consignataria->contratos->where('status', '!=', 1)->whereNull('obs');
+        $contratos = $consignataria->contratos;
+        $contratos_semelhantes = $contratos->whereNotNull('contrato_id')->whereNull('obs');
+        $contratos = $contratos->where('status',"!=",1)->whereNull('obs')->whereNull('contrato_id')->whereNotIn('id', $contratos_semelhantes->pluck('contrato_id')->toArray())->where('n_parcela_referencia','!=',1);
+
+       // $contratos = $consignataria->contratos->where('status', '!=', 1)->whereNull('obs');
         $title = 'Não Validadas';
         return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title'));
 
@@ -165,7 +180,9 @@ class ConsignatariaController extends Controller
     public function sem_prefeitura($id)
     {
         $consignataria = Consignataria::find($id);
-        $contratos = $consignataria->contratos->where('origem', 1)->where('status', '!=', 1);
+        $contratos = $consignataria->contratos->where('origem', 1)->where('status', '!=', 1)->whereNull('contrato_id')->where('n_parcela_referencia','=!',1);
+
+        //dd($contratos);
         $title = "Não encontrados na prefeitura";
         return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title'));
     }
@@ -175,8 +192,9 @@ class ConsignatariaController extends Controller
         $consignataria = Consignataria::find($id);
         $contratos = $consignataria->contratos;
         $contratos_semelhantes = $contratos->whereNotNull('contrato_id')->whereNull('obs');
-        $contratos = $contratos->where('origem',0)->whereNull('obs')->where('status','!=',1)->whereNotIn('id', $contratos_semelhantes->pluck('contrato_id'));
+       // $contratos = $contratos->where('origem',0)->whereNull('obs')->where('status','!=',1)->whereNotIn('id', $contratos_semelhantes->pluck('contrato_id'));
 
+        $contratos = $contratos->where('origem',0)->whereNull('obs')->where('status','!=',1)->whereNotIn('id', $contratos_semelhantes->pluck('contrato_id'))->where('n_parcela_referencia',1);
         //dd($contratos->count());
         $title = "Não encontrados no Arquivo do banco";
         return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title'));
@@ -187,7 +205,7 @@ class ConsignatariaController extends Controller
     {
         $consignataria = Consignataria::find($id);
         $id_reterirar_consulta = $consignataria->contratos->whereNotNull('contrato_id')->pluck('contrato_id')->toArray();
-        $contratos = $consignataria->contratos->where('n_parcela_referencia', 1)->whereNotIn('id', $id_reterirar_consulta);
+        $contratos = $consignataria->contratos->where('n_parcela_referencia', 1)->whereNotIn('id', $id_reterirar_consulta)->whereNull('contrato_id');
         $title = "Renegociação ou novo contrato";
         return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title'));
     }

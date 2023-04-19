@@ -155,6 +155,7 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading, WithG
         $consignataria = Consignataria::find($this->consignantaria_id);
 
 
+
         if (!$consignataria) {
             $filename = Carbon::now()->format('d-m-Y-H-i-s') . 'contratos.txt';
             $content = implode(',', array_map('strval', $row)) . PHP_EOL;
@@ -180,10 +181,10 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading, WithG
             } else {
 
 
-                //$filename = Carbon::now()->format('d-m-Y-H-i-s') . 'servidors.txt';
-                // /$content = implode(',', array_map('strval', $row)) . PHP_EOL;
-                //file_put_contents($filename, $content, FILE_APPEND);
-                //return null;
+                $filename = Carbon::now()->format('d-m-Y-H-i-s') . 'servidors.txt';
+                $content = implode(',', array_map('strval', $row)) . PHP_EOL;
+                file_put_contents($filename, $content, FILE_APPEND);
+                return null;
 
 
             }

@@ -106,10 +106,17 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
     public function model(array $row)
     {
 
+
+        //dd($row);
         $prazo_total = $this->prazo_total ? $row[$this->prazo_total] : 0;
 
-        $prestacao_atual = valida_parcela($this->parcela_atual ? $row[$this->parcela_atual] : ($prazo_total - $row[$this->prazo_remanescente] + 1));
+        if ($this->parcela_atual) {
+            $prestacao_atual = valida_parcela($row[$this->parcela_atual]);
+        } else {
 
+            $prestacao_atual = $row[$this->prazo_total] - $row[$this->prazo_remanescente] + 1;
+        }
+        //dd($prestacao_atual);
         $cod_verba = empty($this->cod_verba) ? 0 : preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->cod_verba]);
 
         $cpf = limpa_corrige_cpf($row[$this->cpf]);
@@ -118,6 +125,7 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
 
         $valor_desconto = corrige_dinheiro2($row[$this->valor_parcela]);
 
+        //dd($row[$this->data_contratacao]);
 
         $data_contratacao = valida_data($row[$this->data_efetivacao]);
 
@@ -143,23 +151,22 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
 
         $contrato = Contrato::where('valor_parcela', floatval($valor_desconto))
             ->where('servidor_id', $servidor->id)
-            ->where('origem',0)
             ->where('origem', 0)->first();
 
 
         if ($contrato) {
-            echo $contrato->servidor->id . ' ' . $servidor->id . "<br>";
-            if ($contrato->total_parcela != $prazo_total) {
+            /*    echo $contrato->servidor->id . ' ' . $servidor->id . "<br>";
+                if ($contrato->total_parcela != $prazo_total) {
 
-                echo $contrato->parcela_total . ' ' . $prazo_total . ' parcela<br>';
-            }
-            if ($contrato->n_parcela_referencia != $prestacao_atual) {
-                echo $contrato->n_parcela_referencia . ' ' . $prestacao_atual . ' parcela<br>';
-            }
-            if ($contrato->servidor_id != $servidor->id) {
-                echo 'servidor<br>';
-            }
-            echo 'contrato<br>';
+                    echo $contrato->parcela_total . ' ' . $prazo_total . ' parcela total<br>';
+                }
+                if ($contrato->n_parcela_referencia != $prestacao_atual) {
+                    echo $contrato->n_parcela_referencia . ' ' . $prestacao_atual . ' parcela atual<br>';
+                }
+                if ($contrato->servidor_id != $servidor->id) {
+                    echo 'servidor<br>';
+                }
+                echo 'contrato<br>'; */
             if ($contrato->total_parcela != $prazo_total || $contrato->n_parcela_referencia != $prestacao_atual || $contrato->servidor_id != $servidor->id) {
                 echo 'oi.<br>';
                 $this->novo_cadastro(
@@ -175,7 +182,7 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
                     $cod_verba,
                     $contrato->id,
                     $this->averbador_id,
-                    1
+                    0
 
                 );
             } else {
@@ -194,67 +201,31 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
 
 
         } else {
-            $servidors = $servidor->pessoa->servidors->pluck('id')->toArray(); // Obtém os IDs de todos os servidores da pessoa associada ao contrato
+            echo 'saiu<br>';
 
-
-            $contrato_semelhante = Contrato::whereIn('servidor_id', $servidors)
-                ->where('consignataria_id', $this->consignataria_id)
-                ->where('origem',0)
-                ->whereBetween('valor_parcela', [$valor_desconto - 1, $valor_desconto + 1])
-                ->with('servidor.pessoa')
-                ->first();
-
-            //   dd($contrato_semelhante);
-            if ($contrato_semelhante) {
-                echo 'semelhante';
-                $this->novo_cadastro(
-                    $servidor->id,
-                    $this->consignataria_id,
-                    $valor_desconto,
-                    $n_contrato,
-                    $data_contratacao,
-                    $prazo_total,
-                    $prestacao_atual,
-                    $valor_liberado,
-                    $valor_devedor,
-                    $cod_verba,
-                    $contrato_semelhante->id,
-                    $this->averbador_id,
-                    1
-
-                );
-
-
-                echo 'oi<br>';
-
-            } else {
-                $grava = [
-                    'servidor_id' => $servidor->id,
-                    'consignataria_id' => $this->consignataria_id,
-                    'valor_parcela' => $valor_desconto,
-                    'contrato' => $n_contrato,
-                    'data_efetivacao' => $data_contratacao,
-                    'total_parcela' => $prazo_total,
-                    'n_parcela_referencia' => $prestacao_atual,
-                    'primeira_parcela' => null,
-                    'ultima_parcela' => null,
-                    'valor_liberado' => $valor_liberado,
-                    'valor_total_financiado' => $valor_liberado,
-                    'valor_saldo_devedor' => $valor_devedor,
-                    'cod_verba' => $cod_verba,
-                    'status' => 2,
-
-                    'averbador_id' => $this->averbador_id,
-                    'origem' => 1
-                ];
-                // echo 'agora<br>';
-                //dd($grava);
-                return Contrato::create($grava);
-            }
-
-
-            //
+            $this->novo_cadastro(
+                $servidor->id,
+                $this->consignataria_id,
+                $valor_desconto,
+                $n_contrato,
+                $data_contratacao,
+                $prazo_total,
+                $prestacao_atual,
+                $valor_liberado,
+                $valor_devedor,
+                $cod_verba,
+                null,
+                $this->averbador_id,
+                0
+            );
+            // echo 'agora<br>';
+            //dd($grava);
+            //  return Contrato::create($grava);
         }
+
+
+        //
+
     }
 
 

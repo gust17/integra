@@ -114,7 +114,7 @@ Route::post('importar-consignatarias', [\App\Http\Controllers\ConsignatariaContr
 
 
 Route::get('pessoateste',function (){
-  $contratos = \App\Models\Contrato::where('consignataria_id',1)->get();
+  $contratos = \App\Models\Contrato::where('consignataria_id',3)->get();
  //dd($contratos);
 
   //dd($contratos->toArray());
