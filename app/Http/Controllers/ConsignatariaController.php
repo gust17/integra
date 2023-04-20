@@ -109,7 +109,7 @@ class ConsignatariaController extends Controller
     public function validada($id)
     {
         $consignataria = Consignataria::find($id);
-        $contratos = $consignataria->contratos->where('status', 1);
+        $contratos = $consignataria->contratos->where('status', 1)->whereNull('obs');
 
         //dd($contratos);
 

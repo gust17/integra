@@ -55,7 +55,7 @@ Route::get('consignataria/banco/import', [\App\Http\Controllers\ContratoControll
 Route::get('testeimport', function () {
     $consignantes_masters = \App\Models\ConsignanteMaster::all();
 
-    return view('teste.import',compact('consignantes_masters'));
+    return view('teste.import', compact('consignantes_masters'));
 });
 Route::post('testeimport', function (Request $request) {
     //dd($request->all());
@@ -113,17 +113,78 @@ Route::get('/ajax-modal/{id}', [\App\Http\Controllers\ContratoController::class,
 Route::post('importar-consignatarias', [\App\Http\Controllers\ConsignatariaController::class, 'import'])->name('consignataria.import');
 
 
-Route::get('pessoateste',function (){
-  $contratos = \App\Models\Contrato::where('consignataria_id',3)->get();
- //dd($contratos);
+Route::get('pessoateste', function () {
+    $contratos = \App\Models\Contrato::where('consignataria_id', 2)->get();
+    //dd($contratos);
 
-  //dd($contratos->toArray());
-  foreach ($contratos as $contrato){
-      $contrato->delete();
-     // $contrato->fill(['origem' => 0]);
-    //  $contrato->save();
+    //dd($contratos->toArray());
+    foreach ($contratos as $contrato) {
+        $contrato->delete();
+        // $contrato->fill(['origem' => 0]);
+        //  $contrato->save();
+
+
+    }
+});
+
+Route::get('validabanco', function () {
+    $consignataria = \App\Models\Consignataria::find(3);
+    $contratos = $consignataria->contratos->whereNotNull('contrato_id');
+
+    foreach ($contratos as $contrato) {
+        $delatar = \App\Models\Contrato::destroy($contrato->contrato_id);
+
+        $contrato->fill(['status' => 1, 'contrato_id' => null]);
+        $contrato->save();
+    }
+});
+
+Route::get('demitidos', function () {
+    $nomes = [
+        "ABNER EDSON FELDMANN",
+"ABNER EDSON FELDMANN",
+"AMARILDO FERREIRA",
+"APARECIDO CRISTOVAM",
+"DABNEY VIEIRA LEONARDO",
+"DENILSON ACELINO LOPES",
+"DIMAS RODRIGUES DA SILVA",
+"DIMAS RODRIGUES DA SILVA",
+"ELIAS MARTINS JUNIOR",
+"JAYR BITENCOURT DA SILVA",
+"JOAO BATISTA CARDOSO",
+"JOSE HONORATO DE JESUS",
+"JOSE HONORATO DE JESUS",
+"JOSE HONORATO DE JESUS",
+"JOSE MARIA SOARES",
+"MARCOS AURELIO DA GAMA",
+"MURILO HAMES",
+"MURILO HAMES",
+"OSNELITO NASCIMENTO",
+"ROGERIO DA COSTA",
+"SALETE DE OLIVEIRA",
+"WILSON JANUARIO FERREIRA",
+"WILSON JANUARIO FERREIRA",
 
 
 
-  }
+
+    ];
+
+    $buscas = Pessoa::whereIn('name',$nomes)->pluck('id')->toArray();
+
+
+    $matriculas = Servidor::whereIn('pessoa_id',$buscas)->pluck('id')->toArray();
+
+
+    $contratos = \App\Models\Contrato::whereIn('servidor_id',$matriculas)->where('status',1)->get();
+
+    //dd($contratos->toArray());
+
+   foreach ($contratos as $contrato){
+        $contrato->update(['status' => 0]);
+   }
+
+
+
+
 });
