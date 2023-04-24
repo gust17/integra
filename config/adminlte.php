@@ -303,6 +303,11 @@ return [
             'icon' => 'fas fa-fw fa-home',
         ],
         [
+            'text' => 'Contratos',
+            'url' => 'contrato',
+            'icon' => 'fas fa-fw fa-lock',
+        ],
+        [
             'text' => 'Consignante Master',
             'url' => 'consignante-master',
             'icon' => 'fas fa-fw fa-lock',

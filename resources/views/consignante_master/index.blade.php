@@ -41,7 +41,7 @@
                     @forelse($consignante_masters as $master)
 
                         <tr>
-                            <td>{{$master->name}}</td>
+                            <td><a href="{{route('consignante-master.show',$master)}}">{{$master->name}}</a></td>
                             <td></td>
                         </tr>
                     @empty

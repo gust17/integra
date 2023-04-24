@@ -3,7 +3,7 @@
 @section('title', 'Consignatarias')
 
 @section('content_header')
-    <h1>{{$consignataria->name}} - Contratos Validados</h1>
+    <h1>Importados</h1>
 @stop
 
 @section('content')
@@ -16,14 +16,13 @@
                         <thead>
                         <tr>
                             <th>Servidor</th>
-                            <th>cpf</th>
                             <th>Matricula</th>
-                            <th>Valor descontado</th>
+                            <th>Valor Descontado</th>
                             <th>Prazo Total</th>
-                            <th>Prestacao Atual</th>
+                            <th>Prestação Atual</th>
                             <th>Contrato</th>
-
-
+                            <th>Origem</th>
+                            <th>Erros</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -33,13 +32,75 @@
 
                             @if($contrato->status == 2 ) style="background-color: #ffdf7e" @endif>
                                 <td>{{$contrato->servidor->pessoa->name}}</td>
-                                <td>{{$contrato->servidor->pessoa->cpf}}</td>
-                                <td>{{$contrato->servidor->matricula}}</td>
+                                <td>{{$contrato->servidor->id}}</td>
                                 <td>{{($contrato->valor_parcela)}}</td>
                                 <td>{{$contrato->total_parcela}}</td>
                                 <td>{{$contrato->n_parcela_referencia}}</td>
                                 <td>{{$contrato->contrato}}</td>
+                                <td>{{$contrato->getNovaOrigem()}}</td>
 
+                                <td>
+
+                                    @if($contrato->obs != NUll)
+                                        Com Observação <br>
+                                    @endif
+                                    @if($contrato->servidor->ativo != 0)
+                                        Matricula Não Encontrada/Inativa <br>
+                                    @endif
+
+                                </td>
+
+                            </tr>
+                        @empty
+                        @endforelse
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="contratos" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Servidor</th>
+                            <th>Matricula</th>
+                            <th>Valor Descontado</th>
+                            <th>Prazo Total</th>
+                            <th>Prestação Atual</th>
+                            <th>Contrato</th>
+                            <th>Origem</th>
+                            <th>Erros</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @forelse($contratos as $contrato)
+
+                            <tr @if($contrato->contrato == 0 ) style="background-color: #dc4c3d" @endif
+
+                            @if($contrato->status == 2 ) style="background-color: #ffdf7e" @endif>
+                                <td>{{$contrato->servidor->pessoa->name}}</td>
+                                <td>{{$contrato->servidor->id}}</td>
+                                <td>{{($contrato->valor_parcela)}}</td>
+                                <td>{{$contrato->total_parcela}}</td>
+                                <td>{{$contrato->n_parcela_referencia}}</td>
+                                <td>{{$contrato->contrato}}</td>
+                                <td>{{$contrato->getNovaOrigem()}}</td>
+
+                                <td>
+
+                                    @if($contrato->obs != NUll)
+                                        Com Observação <br>
+                                    @endif
+                                    @if($contrato->servidor->ativo != 0)
+                                        Matricula Não Encontrada/Inativa <br>
+                                    @endif
+
+                                </td>
 
                             </tr>
                         @empty
@@ -62,7 +123,6 @@
 
 
 @section('js')
-    <script> console.log('Hi!'); </script>
 
     <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
@@ -72,29 +132,7 @@
     <script>
         $(document).ready(function () {
 
-            $('#contratos').DataTable({
-
-                dom: 'Bfrtip',
-                buttons: [{
-                    extend: 'csv',
-                    text: 'Exportar para CSV',
-                    filename: 'Arquivo Validado {{$consignataria->name}}',
-                    charset: "utf8",
-                },
-                    {
-                        extend: 'excel',
-                        text: 'Exportar para Excel'
-                    },
-                    {
-                        extend: 'pdf',
-                        orientation: 'landscape',
-                        text: 'Exportar para PDF'
-                    },
-                    'print',
-
-                ],
-
-            });
+            $('#contratos').DataTable();
 
 
             $('#bancos').select2();
@@ -138,3 +176,4 @@
 
     </script>
 @stop
+

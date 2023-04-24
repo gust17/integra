@@ -6,6 +6,8 @@ use App\Models\Contrato;
 use App\Models\Pessoa;
 use App\Models\Servidor;
 use App\Services\ContratoService;
+use App\Services\PessoaService;
+use App\Services\ServidorService;
 use Carbon\Carbon;
 use Dflydev\DotAccessData\Data;
 use Maatwebsite\Excel\Concerns\Importable;
@@ -106,8 +108,9 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
     public function model(array $row)
     {
 
-
-        //dd($row);
+        $pessoaService = new PessoaService();
+        $servidorService = new ServidorService();
+        $contratoService = new ContratoService();
         $prazo_total = $this->prazo_total ? $row[$this->prazo_total] : 0;
 
         if ($this->parcela_atual) {
@@ -125,7 +128,6 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
 
         $valor_desconto = corrige_dinheiro2($row[$this->valor_parcela]);
 
-        //dd($row[$this->data_contratacao]);
 
         $data_contratacao = valida_data($row[$this->data_efetivacao]);
 
@@ -142,34 +144,21 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
         $matricula = intval(preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->matricula]));
 
         $nome = valida_nome($row[$this->nome]);
-        //dd($matricula);
-
-        $pessoa = $this->valida_pessoa($nome, $cpf);
-
-
-        $servidor = $this->valida_servidor($matricula, $pessoa, $this->consignante_id);
+        $servidor = Servidor::where('matricula', $matricula)->first();
+        if (!$servidor) {
+            $pessoa = $pessoaService->buscaPessoa($cpf) ?: $pessoaService->createPessoa($nome, $cpf, ativo: 0);
+            $servidor = $servidorService->createServidor($pessoa->id, $matricula, $this->consignante_id, 0);
+        }
 
         $contrato = Contrato::where('valor_parcela', floatval($valor_desconto))
             ->where('servidor_id', $servidor->id)
-            ->where('origem', 0)->first();
+            ->where('origem', 0)->where('consignataria_id', $this->consignataria_id)->first();
 
 
         if ($contrato) {
-            /*    echo $contrato->servidor->id . ' ' . $servidor->id . "<br>";
-                if ($contrato->total_parcela != $prazo_total) {
 
-                    echo $contrato->parcela_total . ' ' . $prazo_total . ' parcela total<br>';
-                }
-                if ($contrato->n_parcela_referencia != $prestacao_atual) {
-                    echo $contrato->n_parcela_referencia . ' ' . $prestacao_atual . ' parcela atual<br>';
-                }
-                if ($contrato->servidor_id != $servidor->id) {
-                    echo 'servidor<br>';
-                }
-                echo 'contrato<br>'; */
             if ($contrato->total_parcela != $prazo_total || $contrato->n_parcela_referencia != $prestacao_atual || $contrato->servidor_id != $servidor->id) {
-                echo 'oi.<br>';
-                $this->novo_cadastro(
+                $contratoService->createContrato(
                     $servidor->id,
                     $this->consignataria_id,
                     $valor_desconto,
@@ -182,20 +171,55 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
                     $cod_verba,
                     $contrato->id,
                     $this->averbador_id,
-                    0
+                    0,
+                    '1',
+                    null
 
                 );
             } else {
 
-                echo 'igual<br>';
+                $ativo = 1;
                 //dd('aqui');
-                $atualiza = [
-                    'contrato' => $n_contrato,
-                    'valor_total_financiado' => $valor_financiado,
-                    'data_efetivacao' => $data_contratacao->format('Y-m-d'),
-                    'status' => 1
-                ];
+                if ($pessoa->ativo == 0) {
+                    $ativo = 0;
+                }
+                if ($servidor->ativo == 0) {
+                    $ativo = 0;
+                }
+                if ($contrato->servidor->ativo == 0) {
+                    $ativo = 0;
+                }
+                if ($contrato->obs != null) {
+                    $ativo = 0;
+                }
 
+
+                $contratoAtualiza = $contratoService->createContrato(
+                    $servidor->id,
+                    $this->consignataria_id,
+                    $valor_desconto,
+                    $n_contrato,
+                    $data_contratacao,
+                    $prazo_total,
+                    $prestacao_atual,
+                    $valor_liberado,
+                    $valor_devedor,
+                    $cod_verba,
+                    $contrato->id,
+                    $this->averbador_id,
+                    $ativo,
+                    1,
+                    null
+
+                );
+
+                //dd($contratoAtualiza);
+
+                $atualiza = [
+                    'contrato_id' => $contratoAtualiza->id,
+                    'contrato' => $n_contrato,
+                    'status' => $ativo
+                ];
                 $contrato->update($atualiza);
             }
 
@@ -203,7 +227,7 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
         } else {
             echo 'saiu<br>';
 
-            $this->novo_cadastro(
+            $contratoService->createContrato(
                 $servidor->id,
                 $this->consignataria_id,
                 $valor_desconto,
@@ -216,7 +240,9 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
                 $cod_verba,
                 null,
                 $this->averbador_id,
-                0
+                0,
+                1,
+                null
             );
             // echo 'agora<br>';
             //dd($grava);
@@ -285,7 +311,7 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
 
     )
     {
-        $grava = [
+        $contratograva = Contrato::create([
             'servidor_id' => $servidor,
             'consignataria_id' => $consignataria_id,
             'valor_parcela' => $valor_desconto,
@@ -303,10 +329,11 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
             'status' => $status,
             'averbador_id' => $averbador_id,
             'origem' => 1
-        ];
-        //dd($grava);
+        ]);
+        //  dd($contratograva);
 
-        Contrato::create($grava);
+        return $contratograva;
+
 
     }
 

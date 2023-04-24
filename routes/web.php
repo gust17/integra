@@ -25,7 +25,11 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-
+Route::get('contrato',[\App\Http\Controllers\ContratoController::class,'contratos']);
+Route::post('consulta',[\App\Http\Controllers\ContratoController::class,'consulta']);
+Route::get('consulta/{master}/{consignante}/{averbador}',[\App\Http\Controllers\ContratoController::class,'repostaConsulta']);
+Route::get('relatoriocontrato/{consignataria}/{averbador}',[\App\Http\Controllers\ConsignatariaController::class,'relatorio']);
+Route::get('/consignataria/importados/{averbador}/{consignataria}',[\App\Http\Controllers\ConsignatariaController::class,'importados']);
 Route::resource('consignatarias', \App\Http\Controllers\ConsignatariaController::class);
 Route::resource('pessoas', \App\Http\Controllers\PessoaController::class);
 Route::resource('contratos', \App\Http\Controllers\ContratoController::class)->middleware('auth');

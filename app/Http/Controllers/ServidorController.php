@@ -81,7 +81,7 @@ class ServidorController extends Controller
 
        // dd($request->all());
 
-        $servidorImport = new ServidorImport($request->nome, $request->cpf, $request->matricula, $request->consignante_id);
+        $servidorImport = new ServidorImport($request->nome, $request->cpf, $request->matricula, $request->consignante_id,$request->ativo);
 
 
         Excel::import($servidorImport, $file);

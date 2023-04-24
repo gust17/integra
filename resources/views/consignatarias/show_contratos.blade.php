@@ -61,98 +61,107 @@
     <div class="container-fluid">
         <div class="card">
             <div class="card-body">
+                <div class="progress">
+                    <div class="progress-bar bg-success" style="width:{{get_porcentagem($contratos->count(),$contratos->where('status',1)->whereNull('obs')->count())}}%">
+                        Validados {{get_porcentagem($contratos->count(),$contratos->where('status',1)->whereNull('obs')->count())}}%
+                    </div>
+                    <div class="progress-bar bg-warning" style="width:{{get_porcentagem($contratos->count(),$contratos->where('status',0)->whereNotNull('contrato_id')->whereNotIn('servidor_id',$servidor_inativo->pluck('id'))->whereNull('obs')->count())}}%">
+                        Semelhantes {{get_porcentagem($contratos->count(),$contratos->where('status',0)->whereNotNull('contrato_id')->whereNotIn('servidor_id',$servidor_inativo->pluck('id'))->whereNull('obs')->count())}}%
+                    </div>
+                    <div class="progress-bar bg-danger" style="width:{{get_porcentagem($contratos->count(),$contratos->whereNull('contrato_id')->where('status',0)->whereNull('obs')->count())}}%">
+                        Não Validados {{get_porcentagem($contratos->count(),$contratos->whereNull('contrato_id')->where('status',0)->whereNull('obs')->count())}}%
+                    </div>
+                    <div class="progress-bar bg-primary" style="width:{{get_porcentagem($contratos->count(),$contratos->where('status',0)->whereNotIn('id',$contratos_servidorInativos_semPessoa_Prefeitura->pluck('id'))->whereNotNull('obs')->count())}}%">
+                        Observação {{get_porcentagem($contratos->count(),$contratos->whereNull('contrato_id')->where('status',0)->whereNull('obs')->count())}}%
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
                 <table id="tipos" class="table table-striped">
                     <thead>
                     <tr>
                         <th>Tipo de Status</th>
-                        <th>Quantidade</th>
+                        <th>Prefeitura</th>
+                        <th>Banco</th>
                         <th>Ações</th>
 
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
-                        <td>Validados</td>
-                        <td>{{$contratos->where('status',1)->whereNull('obs')->count()}}</td>
+                        <td>Contratos Importados</td>
+                        <td>{{$contratos->where('origem',0)->count()}}</td>
+                        <td>{{$contratos->where('origem',1)->count()}}</td>
+                        <td>
+                            <a href="{{url("consignataria/importados/$averbador->id/$consignataria->id")}}"
+                               class="btn btn-primary">Visualizar</a>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>Contratos Validados</td>
+                        <td>{{$contratos->where('origem',0)->where('status',1)->whereNull('obs')->count()}}</td>
+                        <td>{{$contratos->where('origem',1)->where('status',1)->whereNull('obs')->count()}}</td>
                         <td>
                             <a href="{{route('consignataria.validada',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
                         </td>
 
                     </tr>
                     <tr>
-                        <td>Não Validados</td>
-                        <td>{{$naovalidados->count()}}</td>
+                        <td>Contratos Não Validados</td>
+                        <td>{{$contratos->where('origem',0)->where('status',0)->whereNull('obs')->count()}}</td>
+                        <td>{{$contratos->where('origem',1)->where('status',0)->whereNotIn('servidor_id',$servidor_inativo->pluck('id'))->whereNull('contrato_id')->whereNull('obs')->count()}}</td>
                         <td>
-                            <a href="{{route('consignataria.naovalidada',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
-                        </td>
-
-                    </tr>
-                    <tr>
-                        <td>Contratos com Inexistentes/Divergentes</td>
-                        <td>{{$contratosSemServidor->count()}}</td>
-                        <td>
-                            <a href="{{route('consignataria.sem_servidor',$consignataria->id)}}"
-                               class="btn btn-primary">Visualizar</a>
-                        </td>
-
-                    </tr>
-                    <tr>
-                        <td>Contratos sem Pessoa</td>
-                        <td>{{$contratosSemPessoa->count()}}</td>
-                        <td>
-                            <a href="{{route('consignataria.sem_pessoa',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Possiveis Renegociações/Novos Contratos</td>
-                        <td>{{$possivelRenegociacao->count()}}</td>
-                        <td>
-                            <a href="{{route('consignataria.novo-contrato',$consignataria->id)}}"
-                               class="btn btn-primary">Visualizar</a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>Contratos Parecidos/Semelhantes</td>
-                        <td>{{$contratos_semelhantes->count()}}</td>
-                        <td>
-                            <a href="{{route('consignataria.semelhante',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>Contratos não Encontrados no Banco</td>
-                        <td>{{$sem_banco}}</td>
-                        <td>
-                            <a href="{{route('consignataria.sem_banco',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
-                        </td>
-
-                    </tr>
-                    <tr>
-                        <td>Contratos não Encontrados na Prefeitura</td>
-                        <td>{{$sem_prefeitura}}</td>
-                        <td>
-                            <a href="{{route('consignataria.sem_prefeitura',$consignataria->id)}}"
-                               class="btn btn-primary">Visualizar</a>
-                        </td>
-
-                    </tr>
-                    <tr>
-                        <td>Contratos com Alguma Observação</td>
-                        <td>{{$contratos->whereNotNull('obs')->count()}}</td>
-                        <td>
-                            <a href="{{route('consignataria.obs',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
+                            <a href="{{route('consignataria.validada',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
                         </td>
 
                     </tr>
 
+
                     <tr>
-                        <td>Total de contratos do arquivo</td>
-                        <td>{{$contratos->count()}}</td>
-                        <td></td>
+                        <td>Contratos com Pessoa Inativo/Inexistente</td>
+                        <td>{{$contratos_servidorInativos_semPessoa_Prefeitura->count()}}</td>
+                        <td>{{$contratos_servidorInativos_semPessoa_Banco->count()}}</td>
+
+                        <td>
+                            <a href="{{route('consignataria.validada',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>Contratos com Servidor Inativo/Inexistente</td>
+                        <td>{{$contratos_servidorInativos_comPessoa_Prefeitura->count()}}</td>
+                        <td>{{$contratos_servidorInativos_comPessoa_Banco->count()}}</td>
+
+                        <td>
+                            <a href="{{route('consignataria.validada',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>Contratos Semelhantes</td>
+                        <td>{{$contratos->where('origem',0)->where('status',0)->whereNotNull('contrato_id')->whereNotIn('servidor_id',$servidor_inativo->pluck('id'))->whereNull('obs')->count()}}</td>
+                        <td>{{$contratos->where('origem',1)->where('status',0)->whereNotNull('contrato_id')->whereNotIn('id',$contratos_servidorInativos_comPessoa_Banco->pluck('id'))->whereNotIn('id',$contratos_servidorInativos_semPessoa_Banco->pluck('id'))->whereNull('obs')->count()}}</td>
+                        <td>
+                            <a href="{{route('consignataria.validada',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>Contratos com Observação</td>
+                        <td>{{$contratos->where('origem',0)->where('status',0)->whereNotIn('id',$contratos_servidorInativos_semPessoa_Prefeitura->pluck('id'))->whereNotNull('obs')->count()}}</td>
+                        <td>{{$contratos->where('origem',1)->where('status',0)->whereNotNull('obs')->count()}}</td>
+                        <td>
+                            <a href="{{route('consignataria.validada',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
+                        </td>
+
                     </tr>
                     </tbody>
                 </table>
+
+
             </div>
         </div>
     </div>

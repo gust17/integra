@@ -22,6 +22,11 @@ class Consignante extends Model
         return $this->belongsTo(ConsignanteMaster::class);
     }
 
+    public function servidors()
+    {
+        return $this->hasMany(Servidor::class);
+    }
+
     public function averbadors()
     {
         return $this->hasMany(Averbador::class);

@@ -45,7 +45,7 @@ class ConsignanteMasterController extends Controller
      */
     public function show(ConsignanteMaster $consignanteMaster)
     {
-        //
+        return view('consignante_master.show',compact('consignanteMaster'));
     }
 
     /**

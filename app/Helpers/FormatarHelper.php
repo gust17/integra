@@ -106,13 +106,20 @@ if (!function_exists('corrige_dinheiro2')) {
 if (!function_exists('valida_data')) {
     function valida_data($value)
     {
-        // Verificar se o valor contém uma barra "/"
+
+        $formats = ['Y-m-d H:i:s.u', 'd/m/Y H:i:s.u', 'Y-m-d\TH:i:s.u', 'Y-m-d H:i:s', 'd/m/Y', 'd-m-Y', 'Y-m-d', 'd/m/Y'];
+
+     //   $formats = ['Y-m-d H:i:s.u', 'd/m/Y H:i:s.u', 'Y-m-d\TH:i:s.u', 'Y-m-d H:i:s', 'd/m/Y', 'd-m-Y', 'Y-m-d'];
+
         if ($value) {
-            $data_carbon = Carbon::createFromFormat('d/m/Y', $value);
-            return $data_carbon;
-        } else {
-            return \Carbon\Carbon::now();
+            try {
+                $data_carbon = Carbon::parse($value);
+                return $data_carbon;
+            } catch (\Exception $e) {
+                // Tratar o erro aqui
+            }
         }
+        return \Carbon\Carbon::now();
     }
 
 }
@@ -145,4 +152,12 @@ if (!function_exists('valida_nome')) {
         return $nome;
     }
 }
+
+if (!function_exists('get_porcentagem')) {
+    function get_porcentagem($total,$valor)
+    {
+       return ($valor*100)/$total;
+    }
+}
+
 

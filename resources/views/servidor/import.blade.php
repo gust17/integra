@@ -53,6 +53,10 @@
                         <input class="form-control" type="text" name="matricula">
                     </div>
                     <div class="form-group">
+                        <label>Coluna com Status do Servidor</label>
+                        <input class="form-control" type="text" name="ativo">
+                    </div>
+                    <div class="form-group">
                         <button class="btn btn-success">Carregar</button>
                     </div>
 

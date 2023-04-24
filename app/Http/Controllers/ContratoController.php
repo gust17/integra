@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Imports\ContratoBancoImport;
 use App\Imports\ContratoImport;
 use App\Imports\PessoaImport;
+use App\Models\Averbador;
 use App\Models\ConsignanteMaster;
 use App\Models\Consignataria;
 use App\Models\Contrato;
@@ -138,7 +139,6 @@ class ContratoController extends Controller
         );
 
 
-
         Excel::import($contratoImport, $file, null, \Maatwebsite\Excel\Excel::CSV, [
             'ignoreEmpty' => true,
             'ignoreEmptyRowAndColumn' => true,
@@ -163,6 +163,27 @@ class ContratoController extends Controller
 
         return [$contrato_semelhante, $contrato];
 
+    }
+
+    public function contratos()
+    {
+        $consignantes_Masters = ConsignanteMaster::all();
+        return view('consignante_master.contratos', compact('consignantes_Masters'));
+    }
+
+    public function consulta(Request $request)
+    {
+        return redirect(url("consulta/$request->consignante_master_id/$request->consignante_id/$request->averbador_id"));
+    }
+
+    public function repostaConsulta($master,
+                                    $consignante,
+                                    $averbador)
+    {
+        $consignatarias = Consignataria::all();
+        $averbador = Averbador::find($averbador);
+
+        return view('contratos.showbancos',compact('consignatarias','averbador'));
     }
 
 

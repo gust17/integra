@@ -24,14 +24,16 @@ class ServidorImport implements ToModel, WithHeadingRow, WithChunkReading
     protected $cpf;
     protected $matricula;
     protected $consignante_id;
+    protected $ativo;
 
 
-    public function __construct($nome, $cpf, $matricula, $consignante_id)
+    public function __construct($nome, $cpf, $matricula, $consignante_id, $ativo)
     {
         $this->nome = $nome;
         $this->cpf = $cpf;
         $this->matricula = $matricula;
         $this->consignante_id = $consignante_id;
+        $this->ativo = $ativo;
     }
 
     public function model(array $row)
@@ -45,10 +47,17 @@ class ServidorImport implements ToModel, WithHeadingRow, WithChunkReading
         if ($this->matricula) {
             $matricula = intval(preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->matricula]));
         }
+        if ($this->ativo) {
+            $ativo = $row[$this->ativo];
+        } else {
+            $ativo = 1;
+        }
 
-// Check if Pessoa record exists for given CPF
+
         $pessoa = Pessoa::where('cpf', $cpf)->first();
 
+
+        //dd($pessoa);
         if ($pessoa) {
             // Check if Servidor record exists for given Matricula
             $servidorExists = $pessoa->servidors->where('matricula', $matricula)->count() > 0;
@@ -57,10 +66,18 @@ class ServidorImport implements ToModel, WithHeadingRow, WithChunkReading
                 // Create new Servidor record
                 $servidor = new Servidor([
                     'matricula' => $matricula,
-                    'consignante_id' => $this->consignante_id
+                    'consignante_id' => $this->consignante_id,
+                    'ativo' => $ativo
                 ]);
 
                 $pessoa->servidors()->save($servidor);
+            } else {
+                $servidor = Servidor::where('pessoa_id', $pessoa->id)->where('matricula', $matricula)->first();
+
+                if ($servidor->ativo != $ativo) {
+                    $servidor->fill(['ativo' => $ativo]);
+                    $servidor->save();
+                }
             }
         } else {
             // Log error to file
