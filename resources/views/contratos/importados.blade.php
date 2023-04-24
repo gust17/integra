@@ -3,16 +3,23 @@
 @section('title', 'Consignatarias')
 
 @section('content_header')
-    <h1>Importados</h1>
+    <h1>Importados Consignataria {{$consignataria->name}} Averbador {{$averbador->name}}</h1>
 @stop
 
 @section('content')
 
     <div class="container-fluid">
+        <div class="rol">
+            <a href="{{url("relatoriocontrato/$consignataria->id/$averbador->id")}}" class="btn btn-warning">Voltar</a>
+            <br>
+            <br>
+
+        </div>
+
         <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table id="contratos" class="table table-striped">
+                    <table id="prefeitura" class="table table-striped">
                         <thead>
                         <tr>
                             <th>Servidor</th>
@@ -26,7 +33,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @forelse($contratos as $contrato)
+                        @forelse($contratos->where('origem',0) as $contrato)
 
                             <tr @if($contrato->contrato == 0 ) style="background-color: #dc4c3d" @endif
 
@@ -64,7 +71,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table id="contratos" class="table table-striped">
+                    <table id="banco" class="table table-striped">
                         <thead>
                         <tr>
                             <th>Servidor</th>
@@ -78,7 +85,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @forelse($contratos as $contrato)
+                        @forelse($contratos->where('origem',1) as $contrato)
 
                             <tr @if($contrato->contrato == 0 ) style="background-color: #dc4c3d" @endif
 
@@ -132,7 +139,8 @@
     <script>
         $(document).ready(function () {
 
-            $('#contratos').DataTable();
+            $('#prefeitura').DataTable();
+            $('#banco').DataTable();
 
 
             $('#bancos').select2();

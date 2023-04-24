@@ -131,8 +131,11 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
 
         $data_contratacao = valida_data($row[$this->data_efetivacao]);
 
-        $valor_financiado = corrige_dinheiro($row[$this->valor_financiado]);
-
+        if ($this->valor_financiado) {
+            $valor_financiado = corrige_dinheiro($row[$this->valor_financiado]);
+        }else{
+            $valor_financiado = 0;
+        }
         $n_contrato = valida_contrato($row[$this->n_contrato]);
 
         $total_parcela = $prazo_total;

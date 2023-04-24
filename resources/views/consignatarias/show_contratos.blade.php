@@ -102,19 +102,19 @@
                     </tr>
                     <tr>
                         <td>Contratos Validados</td>
-                        <td>{{$contratos->where('origem',0)->where('status',1)->whereNull('obs')->count()}}</td>
+                        <td>{{$contratos->where('origem',0)->where('status',1)->count()}}</td>
                         <td>{{$contratos->where('origem',1)->where('status',1)->whereNull('obs')->count()}}</td>
                         <td>
-                            <a href="{{route('consignataria.validada',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
+                            <a href="{{url("consignataria/validada/$averbador->id/$consignataria->id")}}" class="btn btn-primary">Visualizar</a>
                         </td>
 
                     </tr>
                     <tr>
                         <td>Contratos Não Validados</td>
-                        <td>{{$contratos->where('origem',0)->where('status',0)->whereNull('obs')->count()}}</td>
+                        <td>{{$contratos->where('origem',0)->where('status',0)->whereNull('obs')->whereNull('contrato_id')->count()}}</td>
                         <td>{{$contratos->where('origem',1)->where('status',0)->whereNotIn('servidor_id',$servidor_inativo->pluck('id'))->whereNull('contrato_id')->whereNull('obs')->count()}}</td>
                         <td>
-                            <a href="{{route('consignataria.validada',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
+                            <a href="{{url("consignataria/naovalidado/$averbador->id/$consignataria->id")}}" class="btn btn-primary">Visualizar</a>
                         </td>
 
                     </tr>
@@ -126,7 +126,7 @@
                         <td>{{$contratos_servidorInativos_semPessoa_Banco->count()}}</td>
 
                         <td>
-                            <a href="{{route('consignataria.validada',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
+                            <a href="{{url("consignataria/sempessoa/$averbador->id/$consignataria->id")}}" class="btn btn-primary">Visualizar</a>
                         </td>
 
                     </tr>
@@ -136,7 +136,7 @@
                         <td>{{$contratos_servidorInativos_comPessoa_Banco->count()}}</td>
 
                         <td>
-                            <a href="{{route('consignataria.validada',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
+                            <a href="{{url("consignataria/semservidor/$averbador->id/$consignataria->id")}}" class="btn btn-primary">Visualizar</a>
                         </td>
 
                     </tr>
@@ -145,7 +145,7 @@
                         <td>{{$contratos->where('origem',0)->where('status',0)->whereNotNull('contrato_id')->whereNotIn('servidor_id',$servidor_inativo->pluck('id'))->whereNull('obs')->count()}}</td>
                         <td>{{$contratos->where('origem',1)->where('status',0)->whereNotNull('contrato_id')->whereNotIn('id',$contratos_servidorInativos_comPessoa_Banco->pluck('id'))->whereNotIn('id',$contratos_servidorInativos_semPessoa_Banco->pluck('id'))->whereNull('obs')->count()}}</td>
                         <td>
-                            <a href="{{route('consignataria.validada',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
+                            <a href="{{url("consignataria/semelhante/$averbador->id/$consignataria->id")}}" class="btn btn-primary">Visualizar</a>
                         </td>
 
                     </tr>

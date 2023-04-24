@@ -8,6 +8,7 @@ use App\Models\Consignataria;
 use App\Models\Contrato;
 use App\Models\Pessoa;
 use App\Models\Servidor;
+use App\Models\Validados;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -106,7 +107,7 @@ class ConsignatariaController extends Controller
 // Obter contratos de servidores inativos com pessoa associada e origem no banco
         $contratos_servidorInativos_comPessoa_Banco = $contratos->whereIn('servidor_id', $servidor_inativo_comPessoa)->where('origem', 1);
 
-       // dd($contratos_servidorInativos_comPessoa_Banco);
+        // dd($contratos_servidorInativos_comPessoa_Banco);
 
 // Obter contratos de servidores inativos sem pessoa associada e origem na prefeitura
         $contratos_servidorInativos_semPessoa_Prefeitura = $contratos->whereIn('servidor_id', $servidor_inativo_semPessoa)->where('origem', 0);
@@ -118,7 +119,7 @@ class ConsignatariaController extends Controller
 
         $averbador = Averbador::find($averbador);
 // Passar os contratos e a consignatária para a view correspondente
-        return view('consignatarias.show_contratos', compact('contratos', 'consignataria', 'contratos_servidorInativos_semPessoa_Banco', 'contratos_servidorInativos_comPessoa_Banco', 'contratos_servidorInativos_comPessoa_Prefeitura', 'contratos_servidorInativos_semPessoa_Prefeitura', 'servidor_inativo','averbador'));
+        return view('consignatarias.show_contratos', compact('contratos', 'consignataria', 'contratos_servidorInativos_semPessoa_Banco', 'contratos_servidorInativos_comPessoa_Banco', 'contratos_servidorInativos_comPessoa_Prefeitura', 'contratos_servidorInativos_semPessoa_Prefeitura', 'servidor_inativo', 'averbador'));
         //
     }
 
@@ -159,67 +160,80 @@ class ConsignatariaController extends Controller
     }
 
 
-    public function validada($id)
+    public function validada($averbador, $consignataria)
     {
-        $consignataria = Consignataria::find($id);
-        $contratos = $consignataria->contratos->where('status', 1)->whereNull('obs');
+        $consignataria = Consignataria::find($consignataria);
+        $averbador = Averbador::find($averbador);
+        $contratos = Validados::where('consignataria_id', $consignataria->id)->where('averbador_id', $averbador->id)->get();
 
-        //dd($contratos);
+       // dd($contratos);
 
         return view('consignatarias.show_contratos_validados', compact('contratos', 'consignataria'));
 
     }
 
-    public function naovalidada($id)
+    public function naovalidada($averbador, $consignataria)
     {
-        $consignataria = Consignataria::find($id);
-        $contratos = $consignataria->contratos;
-        $contratos_semelhantes = $contratos->whereNotNull('contrato_id')->whereNull('obs');
-        $contratos = $contratos->where('status', "!=", 1)->whereNull('obs')->whereNull('contrato_id')->whereNotIn('id', $contratos_semelhantes->pluck('contrato_id')->toArray())->where('n_parcela_referencia', '!=', 1);
 
-        // $contratos = $consignataria->contratos->where('status', '!=', 1)->whereNull('obs');
+
+        $consignataria = Consignataria::find($consignataria);
+        $averbador = Averbador::find($averbador);
+
+        $contratos = Contrato::where('consignataria_id', $consignataria->id)->where('averbador_id', $averbador->id)->get();
+        $contratos = $contratos->where('status', 0)->whereNull('contrato_id')->whereNull('obs');
         $title = 'Não Validadas';
-        return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title'));
+        return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title', 'averbador'));
 
     }
 
-    public function sem_pessoa($id)
+    public function sem_pessoa($averbador, $consignataria)
     {
-        $consignataria = Consignataria::find($id);
+        $averbador = Averbador::find($averbador);
+        $consignataria = Consignataria::find($consignataria);
+
+
         $contratos = $consignataria->contratos()->whereHas('servidor', function ($query) {
             $query->whereHas('pessoa', function ($query) {
                 $query->where('ativo', false);
             });
-        })->get();
+        })->where('averbador_id', $averbador->id)->get();
 
         $title = "Sem Pessoa";
-        return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title'));
+        return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title', 'averbador'));
 
     }
 
-    public function sem_servidor($id)
+    public function sem_servidor($averbador, $consignataria)
     {
-        $consignataria = Consignataria::find($id);
+        $averbador = Averbador::find($averbador);
+        $consignataria = Consignataria::find($consignataria);
 
         $contratos = $consignataria->contratos()->whereHas('servidor', function ($query) {
             $query->where('ativo', false)->whereHas('pessoa', function ($query) {
                 $query->where('ativo', true);
             });
-        })->get();
+        })->where('averbador_id', $averbador->id)->get();
 
         $title = "Sem Servidor(Matricula)";
 
-        return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title'));
+        return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title', 'averbador'));
 
     }
 
-    public function semelhante($id)
+    public function semelhante($averbador, $consignataria)
     {
-        $consignataria = Consignataria::find($id);
+        $averbador = Averbador::find($averbador);
+        $consignataria = Consignataria::find($consignataria);
 
-        $contratos = $consignataria->contratos->whereNotNull('contrato_id')->whereNull('obs');
+        $pessoa_inativa = Pessoa::where('ativo', 0)->pluck('id');
+
+        $matriculasPessoaInativa = Servidor::where('consignante_id', $averbador->consignante->id)->whereIn('pessoa_id', $pessoa_inativa)->pluck('id');
+
+        $contratos = $consignataria->contratos->whereNotNull('contrato_id')->whereNull('obs')->where('status', 0)->whereNotIn('servidor_id', $matriculasPessoaInativa);
+
+
         $title = "Semelhantes";
-        return view('consignatarias.show_contratos_semelhante', compact('contratos', 'consignataria', 'title'));
+        return view('consignatarias.show_contratos_semelhante', compact('contratos', 'consignataria', 'title', 'averbador'));
     }
 
     public function obs($id)
@@ -277,55 +291,92 @@ class ConsignatariaController extends Controller
 
     public function pesquisa_semelhante(Request $request)
     {
+        // dd($request->all());
+        $averbador = Averbador::find($request->averbador);
 
+        // dd($averbador);
         $consignataria = Consignataria::find($request->consignataria);
 
-        $contratos = $consignataria->contratos->whereNotNull('contrato_id');
 
-        if ($request->matricula_inexistente) {
-            $matriculas = Servidor::where("ativo", 0)->pluck('id')->toArray();
-            $contratos = $contratos->whereIn('servidor_id', $matriculas);
-        }
-        if ($request->matricula) {
-            $matriculasInexistentes = $contratos->filter(function ($contrato) {
-                return $contrato->servidor_id != $contrato->semelhante->servidor->id;
-            })->pluck('id');
-            $contratos = $matriculasInexistentes->count() ? $contratos->whereIn('id', $matriculasInexistentes) : $contratos;
+        $matriculas = Servidor::where("ativo", 0)->where('consignante_id', $averbador->consignante->id)->pluck('id')->toArray();
+        $contratos = Contrato::where('averbador_id', $averbador->id)->where('consignataria_id', $consignataria->id)->whereNotNull('contrato_id')->where('origem', 1)->get();
+        $contratos = $contratos->whereNotIn('servidor_id', $matriculas);
+
+        //dd($contratos);
+
+        $descontoDiferente = [];
+        $prazodiferente = [];
+        $servidorinativo = [];
+        $parceladifente = [];
+        $matriculadiferente = [];
+
+        /// dd($contratos[0]);
+        foreach ($contratos as $contrato) {
+            if ($contrato->n_parcela_referencia != $contrato->semelhante->n_parcela_referencia) {
+                $parceladifente[] = $contrato->id;
+            }
+            if ($contrato->valor_parcela != $contrato->semelhante->valor_parcela) {
+                $descontoDiferente[] = $contrato->id;
+            }
+            if ($contrato->servidor->ativo != 1) {
+                $servidorinativo[] = $contrato->id;
+            }
+            if ($contrato->total_parcela != $contrato->semelhante->total_parcela) {
+                $prazodiferente[] = $contrato->id;
+            }
+            if ($contrato->servidor->ativo != $contrato->semelhante->servidor->ativo) {
+                $matriculadiferente[] = $contrato->id;
+            }
+
         }
 
-        // Filtra os contratos com descontos diferentes, se necessário
-        if ($request->desconto) {
-            $descontosDiferentes = $contratos->filter(function ($contrato) {
-                return $contrato->valor_parcela != $contrato->semelhante->valor_parcela;
-            })->pluck('id');
-            $contratos = $descontosDiferentes->count() ? $contratos->whereIn('id', $descontosDiferentes) : $contratos;
-        }
-        if ($request->parcela) {
-            $parcelasDiferentes = $contratos->filter(function ($contrato) {
-                return $contrato->n_parcela_referencia != $contrato->semelhante->n_parcela_referencia;
-            })->pluck('id');
-            $contratos = $parcelasDiferentes->count() ? $contratos->whereIn('id', $parcelasDiferentes) : $contratos;
-        }
 
-        // Filtra os contratos com prazos diferentes, se necessário
-        if ($request->prazo) {
-            $prazosDiferentes = $contratos->filter(function ($contrato) {
-                return $contrato->total_parcela != $contrato->semelhante->total_parcela;
-            })->pluck('id');
-            $contratos = $prazosDiferentes->count() ? $contratos->whereIn('id', $prazosDiferentes) : $contratos;
+        $sobrando = array_diff($parceladifente, $prazodiferente);
+        $iguais = array_intersect($sobrando, $parceladifente);
+
+        //($contratos->toArray());
+        $contratos = $contratos->whereIn('id', $iguais);
+
+        foreach ($contratos as $contrato) {
+            $grava =
+                [
+                    'servidor_id' => $contrato->servidor_id,
+                    'consignataria_id' => $contrato->consignataria_id,
+                    'averbador_id' => $contrato->averbador_id,
+                    'contrato' => $contrato->contrato,
+                    'data_efetivacao' => $contrato->data_efetivacao,
+                    'total_parcela' => $contrato->total_parcela,
+                    'n_parcela_referencia' => $contrato->n_parcela_referencia,
+                    'primeira_parcela' => null,
+                    'ultima_parcela' => null,
+                    'valor_liberado' => $contrato->valor_liberado,
+                    'valor_parcela' => $contrato->valor_parcela,
+                    'valor_total_financiado' => $contrato->valor_total_financiado,
+                    'valor_saldo_devedor' => $contrato->valor_saldo_devedor,
+                    'cod_verba' => $contrato->semelhante->cod_verba,
+                    'obs' => "validado com arquivo do banco, usando cod verba da Prefeitura"
+
+                ];
+
+            Validados::create($grava);
+            $contrato->fill(['status' => 1]);
+            $contrato->semelhante->fill(['status' => 1]);
+            $contrato->save();
+            $contrato->semelhante->save();
+
         }
-        # code...
 
 
         $title = "Semelhantes Filtro";
-        return view('consignatarias.show_contratos_semelhante', compact('contratos', 'consignataria', 'title'));
+        return view('consignatarias.show_contratos_semelhante', compact('contratos', 'consignataria', 'title', 'averbador'));
     }
 
-    public function importados($averbador,$consignataria)
+    public function importados($averbador, $consignataria)
     {
-        $contratos = Contrato::where('averbador_id',$averbador)->where('consignataria_id',$consignataria)->get();
-
-        return view('contratos.importados',compact('contratos'));
+        $contratos = Contrato::where('averbador_id', $averbador)->where('consignataria_id', $consignataria)->get();
+        $averbador = Averbador::find($averbador);
+        $consignataria = Consignataria::find($consignataria);
+        return view('contratos.importados', compact('contratos', 'averbador', 'consignataria'));
 
     }
 }

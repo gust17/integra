@@ -25,11 +25,11 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::get('contrato',[\App\Http\Controllers\ContratoController::class,'contratos']);
-Route::post('consulta',[\App\Http\Controllers\ContratoController::class,'consulta']);
-Route::get('consulta/{master}/{consignante}/{averbador}',[\App\Http\Controllers\ContratoController::class,'repostaConsulta']);
-Route::get('relatoriocontrato/{consignataria}/{averbador}',[\App\Http\Controllers\ConsignatariaController::class,'relatorio']);
-Route::get('/consignataria/importados/{averbador}/{consignataria}',[\App\Http\Controllers\ConsignatariaController::class,'importados']);
+Route::get('contrato', [\App\Http\Controllers\ContratoController::class, 'contratos']);
+Route::post('consulta', [\App\Http\Controllers\ContratoController::class, 'consulta']);
+Route::get('consulta/{master}/{consignante}/{averbador}', [\App\Http\Controllers\ContratoController::class, 'repostaConsulta']);
+Route::get('relatoriocontrato/{consignataria}/{averbador}', [\App\Http\Controllers\ConsignatariaController::class, 'relatorio']);
+Route::get('/consignataria/importados/{averbador}/{consignataria}', [\App\Http\Controllers\ConsignatariaController::class, 'importados']);
 Route::resource('consignatarias', \App\Http\Controllers\ConsignatariaController::class);
 Route::resource('pessoas', \App\Http\Controllers\PessoaController::class);
 Route::resource('contratos', \App\Http\Controllers\ContratoController::class)->middleware('auth');
@@ -37,6 +37,11 @@ Route::post('contrato-import', [\App\Http\Controllers\ContratoController::class,
 Route::get('consignatarias/{id}/validadas', [\App\Http\Controllers\ConsignatariaController::class, 'validada'])->name('consignataria.validada');
 Route::get('consignataria/import', [\App\Http\Controllers\ConsignatariaController::class, 'create_import'])->name('consignataria.index');
 Route::get('consignatarias/{id}/nao-validadas', [\App\Http\Controllers\ConsignatariaController::class, 'naovalidada'])->name('consignataria.naovalidada');
+Route::get('consignataria/naovalidado/{averbador}/{consignataria}', [\App\Http\Controllers\ConsignatariaController::class, 'naovalidada']);
+Route::get('consignataria/sempessoa/{averbador}/{consignataria}', [\App\Http\Controllers\ConsignatariaController::class, 'sem_pessoa']);
+Route::get('consignataria/semservidor/{averbador}/{consignataria}', [\App\Http\Controllers\ConsignatariaController::class, 'sem_servidor']);
+Route::get('consignataria/semelhante/{averbador}/{consignataria}', [\App\Http\Controllers\ConsignatariaController::class, 'semelhante']);
+Route::get('consignataria/validada/{averbador}/{consignataria}', [\App\Http\Controllers\ConsignatariaController::class, 'validada']);
 Route::get('consignatarias/{id}/contratos_sem_pessoa', [\App\Http\Controllers\ConsignatariaController::class, 'sem_pessoa'])->name('consignataria.sem_pessoa');
 Route::get('consignatarias/{id}/contratos_sem_servidor', [\App\Http\Controllers\ConsignatariaController::class, 'sem_servidor'])->name('consignataria.sem_servidor');
 Route::get('consignatarias/{id}/sem_prefeitura', [\App\Http\Controllers\ConsignatariaController::class, 'sem_prefeitura'])->name('consignataria.sem_prefeitura');
@@ -146,49 +151,80 @@ Route::get('validabanco', function () {
 Route::get('demitidos', function () {
     $nomes = [
         "ABNER EDSON FELDMANN",
-"ABNER EDSON FELDMANN",
-"AMARILDO FERREIRA",
-"APARECIDO CRISTOVAM",
-"DABNEY VIEIRA LEONARDO",
-"DENILSON ACELINO LOPES",
-"DIMAS RODRIGUES DA SILVA",
-"DIMAS RODRIGUES DA SILVA",
-"ELIAS MARTINS JUNIOR",
-"JAYR BITENCOURT DA SILVA",
-"JOAO BATISTA CARDOSO",
-"JOSE HONORATO DE JESUS",
-"JOSE HONORATO DE JESUS",
-"JOSE HONORATO DE JESUS",
-"JOSE MARIA SOARES",
-"MARCOS AURELIO DA GAMA",
-"MURILO HAMES",
-"MURILO HAMES",
-"OSNELITO NASCIMENTO",
-"ROGERIO DA COSTA",
-"SALETE DE OLIVEIRA",
-"WILSON JANUARIO FERREIRA",
-"WILSON JANUARIO FERREIRA",
-
-
+        "ABNER EDSON FELDMANN",
+        "AMARILDO FERREIRA",
+        "APARECIDO CRISTOVAM",
+        "DABNEY VIEIRA LEONARDO",
+        "DENILSON ACELINO LOPES",
+        "DIMAS RODRIGUES DA SILVA",
+        "DIMAS RODRIGUES DA SILVA",
+        "ELIAS MARTINS JUNIOR",
+        "JAYR BITENCOURT DA SILVA",
+        "JOAO BATISTA CARDOSO",
+        "JOSE HONORATO DE JESUS",
+        "JOSE HONORATO DE JESUS",
+        "JOSE HONORATO DE JESUS",
+        "JOSE MARIA SOARES",
+        "MARCOS AURELIO DA GAMA",
+        "MURILO HAMES",
+        "MURILO HAMES",
+        "OSNELITO NASCIMENTO",
+        "ROGERIO DA COSTA",
+        "SALETE DE OLIVEIRA",
+        "WILSON JANUARIO FERREIRA",
+        "WILSON JANUARIO FERREIRA",
 
 
     ];
 
-    $buscas = Pessoa::whereIn('name',$nomes)->pluck('id')->toArray();
+    $buscas = Pessoa::whereIn('name', $nomes)->pluck('id')->toArray();
 
 
-    $matriculas = Servidor::whereIn('pessoa_id',$buscas)->pluck('id')->toArray();
+    $matriculas = Servidor::whereIn('pessoa_id', $buscas)->pluck('id')->toArray();
 
 
-    $contratos = \App\Models\Contrato::whereIn('servidor_id',$matriculas)->where('status',1)->get();
+    $contratos = \App\Models\Contrato::whereIn('servidor_id', $matriculas)->where('status', 1)->get();
 
     //dd($contratos->toArray());
 
-   foreach ($contratos as $contrato){
+    foreach ($contratos as $contrato) {
         $contrato->update(['status' => 0]);
-   }
+    }
 
 
+});
 
+Route::get('validalogo/{averbador}/{consignataria}', function ($averbador, $consignataria) {
+    $averbador = \App\Models\Averbador::find($averbador);
+    $banco = \App\Models\Consignataria::find($consignataria);
+    $contratos = \App\Models\Contrato::where('averbador_id', $averbador->id)->where('consignataria_id', $banco->id)->whereNotNull('contrato_id')->where('status', 1)->where('origem', 1)->get();
+
+
+    //dd($averbador);
+   // $contratoservice = new \App\Services\ContratoService();
+
+    foreach ($contratos as $contrato) {
+        //  dd($contrato);
+        \App\Models\Validados::create(
+            [
+                'servidor_id' => $contrato->servidor_id,
+                'consignataria_id' => $banco->id,
+                'averbador_id' => $averbador->id,
+                'contrato' => $contrato->contrato,
+                'data_efetivacao' => $contrato->data_efetivacao,
+                'total_parcela' => $contrato->total_parcela,
+                'n_parcela_referencia' => $contrato->n_parcela_referencia,
+                'primeira_parcela' => null,
+                'ultima_parcela' => null,
+                'valor_liberado' => $contrato->valor_liberado,
+                'valor_parcela' => $contrato->valor_parcela,
+                'valor_total_financiado'=>$contrato->valor_total_financiado,
+                'valor_saldo_devedor' => $contrato->valor_saldo_devedor,
+                'cod_verba' => $contrato->semelhante->cod_verba,
+                'obs' => null
+
+            ]
+        );
+    }
 
 });

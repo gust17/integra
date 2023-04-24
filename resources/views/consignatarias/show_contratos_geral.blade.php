@@ -8,13 +8,20 @@
 
 @section('content')
 
-
-
     <div class="container-fluid">
+        <div class="rol">
+            <a href="{{url("relatoriocontrato/$consignataria->id/$averbador->id")}}" class="btn btn-warning">Voltar</a>
+            <br>
+            <br>
+
+        </div>
         <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Prefeitura</h3>
+            </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table id="contratos" class="table table-striped">
+                    <table id="prefeitura" class="table table-striped">
                         <thead>
                         <tr>
                             <th>Servidor</th>
@@ -30,7 +37,53 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @forelse($contratos as $contrato)
+                        @forelse($contratos->where('origem',0) as $contrato)
+
+                            <tr @if($contrato->contrato == 0 ) style="background-color: #dc4c3d" @endif
+
+                            @if($contrato->status == 2 ) style="background-color: #ffdf7e" @endif>
+                                <td>{{$contrato->servidor->pessoa->name}}</td>
+                                <td>{{$contrato->servidor->matricula}}</td>
+                                <td>{{format_currency($contrato->valor_parcela)}}</td>
+                                <td>{{$contrato->total_parcela}}</td>
+                                <td>{{$contrato->n_parcela_referencia}}</td>
+                                <td>{{$contrato->contrato}}</td>
+                                <td>{{$contrato->getNovaOrigem()}}</td>
+                                <td>{{$contrato->obs}}</td>
+
+
+                            </tr>
+                        @empty
+                        @endforelse
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Consignataria</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="banco" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Servidor</th>
+                            <th>Matricula</th>
+                            <th>Valor Descontado</th>
+                            <th>Prazo Total</th>
+                            <th>Prestação Atual</th>
+                            <th>Contrato</th>
+                            <th>Origem</th>
+                            <th>OBS</th>
+
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @forelse($contratos->where('origem',1) as $contrato)
 
                             <tr @if($contrato->contrato == 0 ) style="background-color: #dc4c3d" @endif
 
@@ -76,13 +129,38 @@
     <script>
         $(document).ready(function () {
 
-            $('#contratos').DataTable(
+            $('#prefeitura').DataTable(
                 {
-                    "charset": "utf8",
+
                     dom: 'Bfrtip',
                     buttons: [{
                         extend: 'csv',
-                        text: 'Exportar para CSV'
+                        text: 'Exportar para CSV',
+                        charset: "utf8"
+                    },
+                        {
+                            extend: 'excel',
+                            text: 'Exportar para Excel'
+                        },
+                        {
+                            extend: 'pdf',
+                            orientation: 'landscape',
+                            text: 'Exportar para PDF'
+                        },
+                        'print',
+
+                    ],
+
+                }
+            );
+            $('#banco').DataTable(
+                {
+
+                    dom: 'Bfrtip',
+                    buttons: [{
+                        extend: 'csv',
+                        text: 'Exportar para CSV',
+                        charset: "utf8"
                     },
                         {
                             extend: 'excel',

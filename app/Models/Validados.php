@@ -10,6 +10,7 @@ class Validados extends Model
     use HasFactory;
 
 
+
     protected $fillable = [
         'servidor_id',
         'consignataria_id',
@@ -27,4 +28,9 @@ class Validados extends Model
         'cod_verba',
         'obs'
     ];
+
+    public function servidor()
+    {
+        return $this->belongsTo(Servidor::class);
+    }
 }
