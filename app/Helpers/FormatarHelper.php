@@ -109,7 +109,6 @@ if (!function_exists('valida_data')) {
 
         $formats = ['Y-m-d H:i:s.u', 'd/m/Y H:i:s.u', 'Y-m-d\TH:i:s.u', 'Y-m-d H:i:s', 'd/m/Y', 'd-m-Y', 'Y-m-d', 'd/m/Y'];
 
-     //   $formats = ['Y-m-d H:i:s.u', 'd/m/Y H:i:s.u', 'Y-m-d\TH:i:s.u', 'Y-m-d H:i:s', 'd/m/Y', 'd-m-Y', 'Y-m-d'];
 
         if ($value) {
             try {
@@ -160,4 +159,17 @@ if (!function_exists('get_porcentagem')) {
     }
 }
 
+if (!function_exists('validanovadata')){
+    function validanovadata($valor){
+        $dateObject = \Carbon\Carbon::createFromFormat('dMY', $valor);
+        return ($dateObject->format('Ymd'));
+    }
 
+}
+if (!function_exists('validanovadataQTD')){
+    function validanovadataQTD($valor){
+        $dateObject = \Carbon\Carbon::createFromFormat('dMY', $valor);
+        return ($dateObject->diffInMonths()+1);
+    }
+
+}

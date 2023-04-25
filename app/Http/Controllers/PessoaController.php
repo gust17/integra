@@ -109,4 +109,21 @@ class PessoaController extends Controller
 
         return redirect()->back();
     }
+
+    public function pesquisa(Request $request)
+    {
+
+
+        if ($request->has('cpf')) {
+            $pessoas = Pessoa::where('cpf', $request->cpf)->withCount('servidors')->get();
+        } elseif ($request->has('q')) {
+            $pessoas = Pessoa::where('name', 'like', '%' . $request->q . '%')->withCount('servidors')->get();
+        } else {
+            $pessoas = collect();
+        }
+
+        return response()->json($pessoas);
+    }
+
+
 }

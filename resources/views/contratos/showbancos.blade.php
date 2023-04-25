@@ -21,7 +21,7 @@
                         <th>Validados</th>
                         <th>Contratos Prefeitura</th>
                         <th>Contratos Bancos</th>
-                        <th>Progresso</th>
+
 
                     </tr>
                     </thead>
@@ -35,12 +35,7 @@
                             <td>{{$consignataria->contratos->where('averbador_id',$averbador->id)->where('status','=',1)->count()}}</td>
                             <td>{{$consignataria->contratos->where('averbador_id',$averbador->id)->where('origem',0)->count()}}</td>
                             <td>{{$consignataria->contratos->where('averbador_id',$averbador->id)->where('origem',1)->count()}}</td>
-                            <th><div class="progress">
-                                    <div class="progress-bar" role="progressbar" aria-valuenow="70"
-                                         aria-valuemin="0" aria-valuemax="100" style="width:{{$consignataria->getPorcentagem()}}%">
-                                        {{$consignataria->getPorcentagem()}}%
-                                    </div>
-                                </div></th>
+
 
                         </tr>
                     @empty
@@ -54,7 +49,7 @@
 @stop
 
 @section('css')
-    <link rel="stylesheet" href="/css/admin_custom.css">
+
 @stop
 @section('plugins.Datatables', true)
 @section('plugins.Select2', true)

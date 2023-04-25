@@ -106,6 +106,7 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading, WithG
     public function model(array $row)
     {
 
+
         $pessoaService = new PessoaService();
         $servidorService = new ServidorService();
         $contratoService = new ContratoService();
@@ -113,7 +114,11 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading, WithG
         $cpf = limpa_corrige_cpf($row[$this->cpf]);
         $nome = $row[$this->nome];
         $matricula = intval(preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->matricula]));
-        $obs = $row[$this->obs];
+        if ($this->obs) {
+            $obs = $row[$this->obs];
+        } else {
+            $obs = null;
+        }
         $valor_parcela = corrige_dinheiro($row[$this->valor_parcela]);
         $contrato = $this->n_contrato ? preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->n_contrato]) : 0;
         $cod_verba = $this->cod_verba ? preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->cod_verba]) : 0;
@@ -137,7 +142,7 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading, WithG
         }
 
         $pessoa = $servidor->pessoa;
-        $contrato_semelhante = $contratoService->contratoSemelhante($pessoa->servidors->pluck('id')->toArray(), $valor_parcela, 1,$this->consignantaria_id);
+        $contrato_semelhante = $contratoService->contratoSemelhante($pessoa->servidors->pluck('id')->toArray(), $valor_parcela, 1, $this->consignantaria_id);
         $contratoService->createContrato(
             $servidor->id,
             $this->consignantaria_id,
@@ -153,7 +158,8 @@ class ContratoImport implements ToModel, WithHeadingRow, WithChunkReading, WithG
             $this->averbador_id,
             0,
             0,
-            $obs
+            $obs,
+            json_encode($row)
         );
 
     }

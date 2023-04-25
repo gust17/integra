@@ -32,3 +32,6 @@ Route::get('consignante/{id}',function ($id){
 
     return $consignante->averbadors;
 });
+
+Route::get('pessquisapessoa',[\App\Http\Controllers\PessoaController::class,'pesquisa']);
+

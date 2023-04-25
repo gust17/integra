@@ -48,29 +48,29 @@ class ConsignatariaController extends Controller
 // Obter todos os contratos da consignatária
         $contratos = $consignataria->contratos;
 
-// Obter todas as pessoas inativas e seus IDs
+
         $pessoas_inativas = Pessoa::where('ativo', 0)->pluck('id');
 
-// Obter servidores inativos com pessoa associada e seus IDs
+
         $servidor_inativo_comPessoa = Servidor::where('ativo', 0)->whereNotIn('pessoa_id', $pessoas_inativas)->pluck('id');
 
-// Obter servidores inativos sem pessoa associada e seus IDs
+
         $servidor_inativo_semPessoa = Servidor::where('ativo', 0)->whereIn('pessoa_id', $pessoas_inativas)->pluck('id');
 
-// Obter contratos de servidores inativos com pessoa associada e origem na prefeitura
+
         $contratos_servidorInativos_comPessoa_Prefeitura = $contratos->whereIn('servidor_id', $servidor_inativo_comPessoa)->where('origem', 0);
 
-// Obter contratos de servidores inativos com pessoa associada e origem no banco
+
         $contratos_servidorInativos_comPessoa_Banco = $contratos->whereIn('servidor_id', $servidor_inativo_comPessoa)->where('origem', 1);
 
-// Obter contratos de servidores inativos sem pessoa associada e origem na prefeitura
+
         $contratos_servidorInativos_semPessoa_Prefeitura = $contratos->whereIn('servidor_id', $servidor_inativo_semPessoa)->where('origem', 0);
 
-// Obter contratos de servidores inativos sem pessoa associada e origem no banco
+
         $contratos_servidorInativos_semPessoa_Banco = $contratos->whereIn('servidor_id', $servidor_inativo_semPessoa)->where('origem', 1);
 
         $servidor_inativo = Servidor::where('ativo', 0)->get();
-// Passar os contratos e a consignatária para a view correspondente
+
         return view('consignatarias.show_contratos', compact('contratos', 'consignataria', 'contratos_servidorInativos_semPessoa_Banco', 'contratos_servidorInativos_comPessoa_Banco', 'contratos_servidorInativos_comPessoa_Prefeitura', 'contratos_servidorInativos_semPessoa_Prefeitura', 'servidor_inativo'));
         //
     }
@@ -78,7 +78,7 @@ class ConsignatariaController extends Controller
     public function relatorio($consignataria, $averbador)
     {
         $consignataria = Consignataria::find($consignataria);
-// Obter todos os contratos da consignatária
+
         $contratos = $consignataria->contratos->where('averbador_id', $averbador);
 
 
@@ -149,6 +149,9 @@ class ConsignatariaController extends Controller
 
     public function import(Request $request)
     {
+        $validatedData = $request->validate([
+            'file' => 'required|file|mimes:csv',
+        ]);
         $file = $request->file('file');
         $consignatariaImport = new ConsignatariaImport($request->consignataria);
 
@@ -166,7 +169,7 @@ class ConsignatariaController extends Controller
         $averbador = Averbador::find($averbador);
         $contratos = Validados::where('consignataria_id', $consignataria->id)->where('averbador_id', $averbador->id)->get();
 
-       // dd($contratos);
+        // dd($contratos);
 
         return view('consignatarias.show_contratos_validados', compact('contratos', 'consignataria'));
 
@@ -358,11 +361,11 @@ class ConsignatariaController extends Controller
 
                 ];
 
-            Validados::create($grava);
-            $contrato->fill(['status' => 1]);
-            $contrato->semelhante->fill(['status' => 1]);
-            $contrato->save();
-            $contrato->semelhante->save();
+            // Validados::create($grava);
+            // $contrato->fill(['status' => 1]);
+            //  $contrato->semelhante->fill(['status' => 1]);
+            //  $contrato->save();
+            //  $contrato->semelhante->save();
 
         }
 

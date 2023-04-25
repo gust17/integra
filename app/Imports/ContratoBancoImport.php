@@ -108,6 +108,7 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
     public function model(array $row)
     {
 
+        // dd($row);
         $pessoaService = new PessoaService();
         $servidorService = new ServidorService();
         $contratoService = new ContratoService();
@@ -116,8 +117,11 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
         if ($this->parcela_atual) {
             $prestacao_atual = valida_parcela($row[$this->parcela_atual]);
         } else {
-
-            $prestacao_atual = $row[$this->prazo_total] - $row[$this->prazo_remanescente] + 1;
+            if ($this->prazo_remanescente) {
+                $prestacao_atual = $row[$this->prazo_total] - $row[$this->prazo_remanescente] + 1;
+            } else {
+                $prestacao_atual = 0;
+            }
         }
         //dd($prestacao_atual);
         $cod_verba = empty($this->cod_verba) ? 0 : preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->cod_verba]);
@@ -128,12 +132,14 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
 
         $valor_desconto = corrige_dinheiro2($row[$this->valor_parcela]);
 
-
-        $data_contratacao = valida_data($row[$this->data_efetivacao]);
-
+        if ($this->data_efetivacao) {
+            $data_contratacao = valida_data($row[$this->data_efetivacao]);
+        } else {
+            $data_contratacao = Carbon::now();
+        }
         if ($this->valor_financiado) {
             $valor_financiado = corrige_dinheiro($row[$this->valor_financiado]);
-        }else{
+        } else {
             $valor_financiado = 0;
         }
         $n_contrato = valida_contrato($row[$this->n_contrato]);
@@ -143,9 +149,11 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
         $valor_liberado = $valor_desconto * $total_parcela;
 
         $valor_devedor = $valor_liberado - ($valor_desconto * $prestacao_atual);
-
-        $matricula = intval(preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->matricula]));
-
+        if ($this->matricula) {
+            $matricula = intval(preg_replace('/[^a-zA-Z0-9\s]/', '', $row[$this->matricula]));
+        } else {
+            $matricula = $cpf;
+        }
         $nome = valida_nome($row[$this->nome]);
         $servidor = Servidor::where('matricula', $matricula)->first();
         if (!$servidor) {
@@ -154,11 +162,11 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
         }
 
         $contrato = Contrato::where('valor_parcela', floatval($valor_desconto))
-            ->where('servidor_id', $servidor->id)
             ->where('origem', 0)->where('consignataria_id', $this->consignataria_id)->first();
 
 
         if ($contrato) {
+            // dd($contrato->servidor->pessoa->name,$row);
 
             if ($contrato->total_parcela != $prazo_total || $contrato->n_parcela_referencia != $prestacao_atual || $contrato->servidor_id != $servidor->id) {
                 $contratoService->createContrato(
@@ -176,7 +184,8 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
                     $this->averbador_id,
                     0,
                     '1',
-                    null
+                    null,
+                    json_encode($row)
 
                 );
             } else {
@@ -212,7 +221,8 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
                     $this->averbador_id,
                     $ativo,
                     1,
-                    null
+                    null,
+                    json_encode($row)
 
                 );
 
@@ -245,7 +255,8 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
                 $this->averbador_id,
                 0,
                 1,
-                null
+                null,
+                json_encode($row)
             );
             // echo 'agora<br>';
             //dd($grava);

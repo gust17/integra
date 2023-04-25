@@ -34,7 +34,8 @@ class Contrato extends Model
         'servidor_existente',
         'contrato_id',
         'averbador_id',
-        'origem'
+        'origem',
+        'linha_geral'
     ];
 
     public function servidor()

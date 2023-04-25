@@ -23,6 +23,12 @@ Route::get('/', function () {
 //Auth::routes(['register' => false]);
 Auth::routes();
 
+Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function () {
+    Route::get('/', 'AdminController@index');
+    Route::get('/users', 'UserController@index');
+    Route::get('/settings', 'SettingsController@index');
+});
+
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::get('contrato', [\App\Http\Controllers\ContratoController::class, 'contratos']);
@@ -227,4 +233,21 @@ Route::get('validalogo/{averbador}/{consignataria}', function ($averbador, $cons
         );
     }
 
+});
+Route::get('testepessoa',function (){
+    $pessoas =  Pessoa::all();
+    foreach ($pessoas as $pessoa){
+        if ($pessoa->servidors->count() == 0){
+           //Pessoa::destroy($pessoa->id);
+        }
+    }
+});
+
+Route::get('buscasemelhante',function (){
+    $consignataria = \App\Models\Consignataria::find(1);
+    $averbador = \App\Models\Averbador::find(4);
+    $contratos = \App\Models\Contrato::where('averbador_id',$averbador->id)->whereNotNull('contrato_id')->get();
+  //  dd($contratos);
+    $title = 'semelhante teste';
+    return view('consignatarias.show_contratos_semelhante2',compact('contratos','averbador','consignataria','title'));
 });

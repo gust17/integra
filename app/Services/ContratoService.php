@@ -22,7 +22,8 @@ class ContratoService
         $averbador_id,
         $status,
         $origem,
-        $obs
+        $obs,
+        $linha,
 
     )
     {
@@ -42,7 +43,8 @@ class ContratoService
             'status' => $status,
             'averbador_id' => $averbador_id,
             'origem' => $origem,
-            'obs' => $obs
+            'obs' => $obs,
+            'linha_geral' => $linha
         ];
         // dd($grava);
 

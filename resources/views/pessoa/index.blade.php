@@ -7,9 +7,21 @@
 @stop
 
 @section('content')
-  
 
     <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <form action="{{url('datalhes')}}">
+                    <div class="form-group">
+                        <label for="">Pesquisar Nome</label>
+                        <select class="form-control" name="pessoa" id="pessoa"></select>
+                    </div>
+                    <div class="form-group">
+                        <button>Pesquisar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
         <div class="card">
             <div class="card-body">
                 <table id="pessoas" class="table table-striped">
@@ -44,6 +56,7 @@
 
 @stop
 @section('plugins.Datatables', true)
+@section('plugins.Select2', true)
 
 
 @section('js')
@@ -53,6 +66,32 @@
         $(document).ready(function () {
 
             $('#pessoas').DataTable();
+        });
+
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#pessoa').select2({
+                minimumInputLength: 3,
+                ajax: {
+                    url: '/api/pessquisapessoa',
+                    dataType: 'json',
+                    delay: 250,
+                    cache: true,
+                    data: (params) => {
+                        const term = params.term.trim();
+                        const isCPF = /^\d{11}$/.test(term);
+                        return {[isCPF ? 'cpf' : 'q']: term};
+                    },
+                    processResults: (data) => ({
+                        results: data.map(({id, name, servidors_count}) => ({
+                            id,
+                            text: `${name} - ${servidors_count} matricula(s)`,
+                        })),
+                    }),
+                },
+            });
         });
     </script>
 @stop

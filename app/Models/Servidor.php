@@ -9,6 +9,9 @@ class Servidor extends Model
 {
     use HasFactory;
 
+    //protected $connection = 'oracle';
+
+    //protected $table = 'SERVIDOR';
     protected $fillable = [
         'matricula',
         'pessoa_id',

@@ -333,6 +333,12 @@ return [
             'url' => 'averbadors',
             'icon' => 'fas fa-fw fa-building',
         ],
+        [
+            'text' => 'Usuarios',
+            'url' => 'admin/usuario',
+            'icon' => 'fas fa-fw fa-building',
+        ],
+
 
         [
             'text' => 'Migrações',
