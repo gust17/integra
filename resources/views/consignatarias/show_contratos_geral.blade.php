@@ -49,7 +49,9 @@
                                 <td>{{$contrato->n_parcela_referencia}}</td>
                                 <td>{{$contrato->contrato}}</td>
                                 <td>{{$contrato->getNovaOrigem()}}</td>
-                                <td>{{$contrato->obs}}</td>
+                                <td>
+
+                                </td>
 
 
                             </tr>
@@ -95,7 +97,9 @@
                                 <td>{{$contrato->n_parcela_referencia}}</td>
                                 <td>{{$contrato->contrato}}</td>
                                 <td>{{$contrato->getNovaOrigem()}}</td>
-                                <td>{{$contrato->obs}}</td>
+                                <td>
+
+                                </td>
 
 
                             </tr>

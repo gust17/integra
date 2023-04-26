@@ -19,7 +19,9 @@
                                     id="consignante_master">
                                 <option></option>
                                 @forelse($consignantes_Masters as $consignantes_master)
-                                    <option value="{{$consignantes_master->id}}">{{$consignantes_master->name}}</option>
+
+                                    <option
+                                        value="{{$consignantes_master->id}}" {{(old('consignante_master_id', $consignantes_master->id) == $consignantes_master->id ? 'selected' : '')}} > {{$consignantes_master->name}} </option>
 
                                 @empty
                                 @endforelse

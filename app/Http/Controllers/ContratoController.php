@@ -110,6 +110,8 @@ class ContratoController extends Controller
         );
 
         Excel::import($contratoImport, $file, null, \Maatwebsite\Excel\Excel::CSV);
+
+        return redirect()->back();
     }
 
     public function importBanco(Request $request)
@@ -145,7 +147,7 @@ class ContratoController extends Controller
             'headingRow' => 66
 
         ]);
-
+        return redirect()->back();
     }
 
     public function modal($id)
@@ -173,6 +175,12 @@ class ContratoController extends Controller
 
     public function consulta(Request $request)
     {
+        $validated = $request->validate([
+            'consignante_master_id' => 'required',
+            'consignante_id' => 'required',
+            'averbador_id' => 'required',
+        ]);
+        //dd($request->all());
         return redirect(url("consulta/$request->consignante_master_id/$request->consignante_id/$request->averbador_id"));
     }
 
@@ -183,7 +191,7 @@ class ContratoController extends Controller
         $consignatarias = Consignataria::all();
         $averbador = Averbador::find($averbador);
 
-        return view('contratos.showbancos',compact('consignatarias','averbador'));
+        return view('contratos.showbancos', compact('consignatarias', 'averbador'));
     }
 
 

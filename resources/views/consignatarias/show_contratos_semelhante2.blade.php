@@ -7,6 +7,7 @@
 @stop
 
 @section('content')
+
     <div class="container-fluid">
         <div class="card">
             <div class="card-header">
@@ -93,9 +94,13 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @forelse($contratos as $contrato)
+
+                        @forelse($contratos->where('origem',0) as $contrato)
+
                             <tr>
+
                                 <td>{{ $contrato->servidor->pessoa->name }}</td>
+
                                 <td>{{ $contrato->semelhante->servidor->pessoa->name }}</td>
                                 <td>{{ $contrato->servidor->matricula }}</td>
                                 <td>{{ $contrato->semelhante->servidor->matricula }}</td>
@@ -109,7 +114,7 @@
                                 <td>{{ $contrato->semelhante->contrato }}</td>
                                 <td>{{$contrato->origem}}</td>
                                 <td>
-                                    @if ($contrato->servidor->matricula != $contrato->semelhante->servidor->matricula)
+                                    @if ($contrato->servidor->pessoa->id != $contrato->semelhante->servidor->pessoa->id)
                                         Matricula
                                     @endif
                                     @if ($contrato->valor_parcela != $contrato->semelhante->valor_parcela)
@@ -134,6 +139,7 @@
         </div>
 
     </div>
+
     <div class="container-fluid">
         <div class="card">
             <div class="card-header">
@@ -158,13 +164,13 @@
                             <th>NR_PARCELA_MES_ATUAL</th>
 
 
-
                         </tr>
                         </thead>
                         <tbody>
-                        @forelse($contratos as $contrato)
+                        @forelse($contratos->where('origem',1) as $contrato)
 
                             <tr>
+
                                 <td>{!!  json_decode($contrato->semelhante->linha_geral)->cd_solicitacao !!}</td>
                                 <td>{!!  json_decode($contrato->linha_geral)->NR_CTR_CVN !!}</td>
                                 <td>{!!  json_decode($contrato->linha_geral)->COD_CPF_CGC !!}</td>
@@ -176,65 +182,11 @@
                                 <td>{!!  json_decode($contrato->linha_geral)->QT_PCL_CTR !!}</td>
                                 <td>{!!  validanovadata(json_decode($contrato->linha_geral)->DT_FIM_CTR_CDC)!!}</td>
                                 <td>{!! validanovadataQTD(json_decode($contrato->linha_geral)->VCTO_PRIM_PARCELA) !!}</td>
-                                <td>@if ($contrato->total_parcela != $contrato->semelhante->total_parcela) Prazo  @endif</td>
-
+                                <td>@if ($contrato->total_parcela != $contrato->semelhante->total_parcela)
+                                        Prazo
+                                    @endif</td>
                             </tr>
 
-                        @empty
-                        @endforelse
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="container-fluid">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Geral - Prazo Separado</h3>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table id="banco-separado" class="table table-striped">
-                        <thead>
-                        <tr>
-                            <th>cd_solicitacao</th>
-                            <th>NR_CTR_CVN</th>
-                            <th>COD_CPF_CGC</th>
-                            <th>NOM</th>
-                            <th>NR_CTR_OPR</th>
-                            <th>DT_OPR_CDC</th>
-                            <th>VCTO_PRIM_PARCELA</th>
-                            <th>VL_INC_PCL_CTR</th>
-                            <th>QT_PCL_CTR</th>
-                            <th>DT_FIM_CTR_CDC</th>
-
-
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @forelse($contratos as $contrato)
-                            @if ($contrato->total_parcela != $contrato->semelhante->total_parcela)
-                                <tr>
-                                    <td>{!!  json_decode($contrato->semelhante->linha_geral)->cd_solicitacao !!}</td>
-
-                                    <td>{!!  json_decode($contrato->linha_geral)->NR_CTR_CVN !!}</td>
-                                    <td>{!!  json_decode($contrato->linha_geral)->COD_CPF_CGC !!}</td>
-                                    <td>{!!  json_decode($contrato->linha_geral)->NOM !!}</td>
-                                    <td>{!!  json_decode($contrato->linha_geral)->NR_CTR_OPR !!}</td>
-                                    <td>{!!  validanovadata(json_decode($contrato->linha_geral)->DT_OPR_CDC) !!}</td>
-                                    <td>{!!   validanovadata(json_decode($contrato->linha_geral)->VCTO_PRIM_PARCELA) !!}</td>
-                                    <td>{!!  json_decode($contrato->linha_geral)->VL_INC_PCL_CTR !!}</td>
-                                    <td>{!!  json_decode($contrato->linha_geral)->QT_PCL_CTR !!}</td>
-                                    <td>{!!  validanovadata(json_decode($contrato->linha_geral)->DT_FIM_CTR_CDC)!!}</td>
-                                </tr>
-                            @else
-
-
-                            @endif
                         @empty
                         @endforelse
 

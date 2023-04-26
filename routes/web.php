@@ -207,7 +207,7 @@ Route::get('validalogo/{averbador}/{consignataria}', function ($averbador, $cons
 
 
     //dd($averbador);
-   // $contratoservice = new \App\Services\ContratoService();
+    // $contratoservice = new \App\Services\ContratoService();
 
     foreach ($contratos as $contrato) {
         //  dd($contrato);
@@ -224,7 +224,7 @@ Route::get('validalogo/{averbador}/{consignataria}', function ($averbador, $cons
                 'ultima_parcela' => null,
                 'valor_liberado' => $contrato->valor_liberado,
                 'valor_parcela' => $contrato->valor_parcela,
-                'valor_total_financiado'=>$contrato->valor_total_financiado,
+                'valor_total_financiado' => $contrato->valor_total_financiado,
                 'valor_saldo_devedor' => $contrato->valor_saldo_devedor,
                 'cod_verba' => $contrato->semelhante->cod_verba,
                 'obs' => null
@@ -234,20 +234,85 @@ Route::get('validalogo/{averbador}/{consignataria}', function ($averbador, $cons
     }
 
 });
-Route::get('testepessoa',function (){
-    $pessoas =  Pessoa::all();
-    foreach ($pessoas as $pessoa){
-        if ($pessoa->servidors->count() == 0){
-           //Pessoa::destroy($pessoa->id);
+Route::get('testepessoa', function () {
+    $pessoas = Pessoa::all();
+    foreach ($pessoas as $pessoa) {
+        if ($pessoa->servidors->count() == 0) {
+            //Pessoa::destroy($pessoa->id);
         }
     }
 });
 
-Route::get('buscasemelhante',function (){
+Route::get('buscasemelhante', function () {
     $consignataria = \App\Models\Consignataria::find(1);
     $averbador = \App\Models\Averbador::find(4);
-    $contratos = \App\Models\Contrato::where('averbador_id',$averbador->id)->whereNotNull('contrato_id')->get();
-  //  dd($contratos);
+    $contratos = \App\Models\Contrato::where('averbador_id', $averbador->id)->whereNotNull('contrato_id')->get();
+    //  dd($contratos);
     $title = 'semelhante teste';
-    return view('consignatarias.show_contratos_semelhante2',compact('contratos','averbador','consignataria','title'));
+    return view('consignatarias.show_contratos_semelhante2', compact('contratos', 'averbador', 'consignataria', 'title'));
+});
+
+
+Route::get('simuladorteste', function () {
+
+
+    $taxainfor = 4;
+
+    $int = [];
+    $int[] = ['inicio' => 1, 'final' => 12, 'taxa' => 4.8, 'prioridade' => 1];
+    $int[] = ['inicio' => 1, 'final' => 24, 'taxa' => 6.2, 'prioridade' => 2];
+    $int[] = ['inicio' => 1, 'final' => 36, 'taxa' => 3.5, 'prioridade' => 3];
+    $int[] = ['inicio' => 34, 'final' => 34, 'taxa' => 9, 'prioridade' => 4];
+    $intervalos_encontrados = [];
+
+    foreach ($int as $intervalo) {
+        if ($taxainfor >= $intervalo['inicio'] && $taxainfor <= $intervalo['final']) {
+
+
+            $intervalos_encontrados[] = $intervalo;
+        }
+    }
+
+
+    if (count($intervalos_encontrados) > 0) {
+
+        echo "A taxa informada está presente nos seguintes intervalos:\n";
+        foreach ($intervalos_encontrados as $intervalo) {
+
+            echo "- De {$intervalo['inicio']} a {$intervalo['final']}, com valor de taxa de {$intervalo['taxa']}%.\n";
+        }
+    } else {
+        echo "A taxa informada não está presente em nenhum dos intervalos ou não está dentro do intervalo.";
+    }
+
+});
+
+Route::get('ajeitasemelhantes', function () {
+    $consignataria = \App\Models\Consignataria::find(1);
+    $averbador = \App\Models\Averbador::find(4);
+    $contratos = \App\Models\Contrato::where('averbador_id', $averbador->id)->where('origem', 1)->whereNotNull('row')->get();
+
+    //dd($contratos->whereNotNull('contrato_id'));
+
+
+    foreach ($contratos as $contrato) {
+        $buscasemelhantes = \App\Models\Contrato::where('origem', 0)
+            ->where('valor_parcela', $contrato->valor_parcela)
+            ->where('averbador_id', $averbador->id)
+            ->whereHas('servidor.pessoa', function ($query) use ($contrato) {
+                $query->where('id', $contrato->servidor->pessoa->id);
+            })->first();
+
+        if ($buscasemelhantes) {
+           // dd($buscasemelhantes->servidor->pessoa->name,$contrato->servidor->pessoa->name);
+            $contrato->fill(['contrato_id' => $buscasemelhantes->id]);
+            $buscasemelhantes->fill(['contrato_id' => $contrato->id]);
+            $contrato->save();
+            $buscasemelhantes->save();
+        } else {
+            $contrato->fill(['contrato_id' => null]);
+            $contrato->save();
+
+        }
+    }
 });
