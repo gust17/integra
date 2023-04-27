@@ -53,6 +53,11 @@ class Contrato extends Model
         return $this->belongsTo(Contrato::class, 'contrato_id', 'id');
     }
 
+    public function consignataria()
+    {
+        return $this->belongsTo(Consignataria::class);
+    }
+
     public function getSemelhante($id)
     {
         $contrato = Contrato::find($id); // Obtem o contrato pelo ID
@@ -72,10 +77,10 @@ class Contrato extends Model
 
     public function getNovaOrigem()
     {
-        if ($this->attributes['origem'] == 0){
+        if ($this->attributes['origem'] == 0) {
             return 'Prefeitura';
-        }else{
-            return  'Banco';
+        } else {
+            return 'Banco';
         }
     }
 

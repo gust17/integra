@@ -67,7 +67,8 @@ class ServidorImport implements ToModel, WithHeadingRow, WithChunkReading
                 $servidor = new Servidor([
                     'matricula' => $matricula,
                     'consignante_id' => $this->consignante_id,
-                    'ativo' => $ativo
+                    'ativo' => $ativo,
+                    'averbador_id'=> 2
                 ]);
 
                 $pessoa->servidors()->save($servidor);

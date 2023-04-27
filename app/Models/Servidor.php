@@ -15,6 +15,7 @@ class Servidor extends Model
     protected $fillable = [
         'matricula',
         'pessoa_id',
+        'averbador_id',
         'consignante_id',
         'ativo'
     ];
@@ -28,5 +29,10 @@ class Servidor extends Model
     public function contratos()
     {
         return $this->hasMany(Contrato::class);
+    }
+
+    public function consignante()
+    {
+        return $this->belongsTo(Consignante::class);
     }
 }

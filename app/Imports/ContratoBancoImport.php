@@ -108,6 +108,7 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
     public function model(array $row)
     {
 
+        //  dd($row);
         // dd($row);
         $pessoaService = new PessoaService();
         $servidorService = new ServidorService();
@@ -156,17 +157,27 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
         }
         $nome = valida_nome($row[$this->nome]);
         $servidor = Servidor::where('matricula', $matricula)->first();
+
+
+
         if (!$servidor) {
             $pessoa = $pessoaService->buscaPessoa($cpf) ?: $pessoaService->createPessoa($nome, $cpf, ativo: 0);
-            $servidor = $servidorService->createServidor($pessoa->id, $matricula, $this->consignante_id, 0);
+
+            $servidor = $servidorService->createServidor($pessoa->id, $matricula, $this->consignante_id, 0, $this->averbador_id);
         }
 
-        $contrato = Contrato::where('valor_parcela', floatval($valor_desconto))
-            ->where('origem', 0)->where('consignataria_id', $this->consignataria_id)->first();
+
+
+
+        $contrato = \App\Models\Contrato::where('origem', 0)
+            ->where('valor_parcela', floatval($valor_desconto))
+            ->where('averbador_id', $this->averbador_id)
+            ->whereHas('servidor.pessoa', function ($query) use ($servidor) {
+                $query->where('id', $servidor->pessoa->id);
+            })->first();
 
 
         if ($contrato) {
-            // dd($contrato->servidor->pessoa->name,$row);
 
             if ($contrato->total_parcela != $prazo_total || $contrato->n_parcela_referencia != $prestacao_atual || $contrato->servidor_id != $servidor->id) {
                 $contratoService->createContrato(
@@ -252,7 +263,7 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
                 $valor_devedor,
                 $cod_verba,
                 null,
-                $this->averbador_id,
+                $servidor->averbador_id,
                 0,
                 1,
                 null,

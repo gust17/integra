@@ -62,17 +62,32 @@
         <div class="card">
             <div class="card-body">
                 <div class="progress">
-                    <div class="progress-bar bg-success" style="width:{{get_porcentagem($contratos->count(),$contratos->where('status',1)->whereNull('obs')->count())}}%">
-                        Validados {{get_porcentagem($contratos->count(),$contratos->where('status',1)->whereNull('obs')->count())}}%
+                    <div class="progress-bar bg-success"
+                         style="width:{{get_porcentagem($contratos->count(),$contratos->where('status',1)->whereNull('obs')->count())}}%">
+                        Validados {{get_porcentagem($contratos->count(),$contratos->where('status',1)->whereNull('obs')->count())}}
+                        %
                     </div>
-                    <div class="progress-bar bg-warning" style="width:{{get_porcentagem($contratos->count(),$contratos->where('status',0)->whereNotNull('contrato_id')->whereNotIn('servidor_id',$servidor_inativo->pluck('id'))->whereNull('obs')->count())}}%">
-                        Semelhantes {{get_porcentagem($contratos->count(),$contratos->where('status',0)->whereNotNull('contrato_id')->whereNotIn('servidor_id',$servidor_inativo->pluck('id'))->whereNull('obs')->count())}}%
+                    <div class="progress-bar bg-warning"
+                         style="width:{{get_porcentagem($contratos->count(),$contratos->where('status',0)->whereNotNull('contrato_id')->whereNotIn('servidor_id',$servidor_inativo->pluck('id'))->whereNull('obs')->count())}}%">
+                        Semelhantes {{get_porcentagem($contratos->count(),$contratos->where('status',0)->whereNotNull('contrato_id')->whereNotIn('servidor_id',$servidor_inativo->pluck('id'))->whereNull('obs')->count())}}
+                        %
                     </div>
-                    <div class="progress-bar bg-danger" style="width:{{get_porcentagem($contratos->count(),$contratos->whereNull('contrato_id')->where('status',0)->whereNull('obs')->count())}}%">
-                        Não Validados {{get_porcentagem($contratos->count(),$contratos->whereNull('contrato_id')->where('status',0)->whereNull('obs')->count())}}%
+                    <div class="progress-bar bg-danger"
+                         style="width:{{get_porcentagem($contratos->count(),$contratos->whereNull('contrato_id')->where('status',0)->whereNull('obs')->count())}}%">
+                        Não
+                        Validados {{get_porcentagem($contratos->count(),$contratos->whereNull('contrato_id')->where('status',0)->whereNull('obs')->count())}}
+                        %
                     </div>
-                    <div class="progress-bar bg-primary" style="width:{{get_porcentagem($contratos->count(),$contratos->where('status',0)->whereNotIn('id',$contratos_servidorInativos_semPessoa_Prefeitura->pluck('id'))->whereNotNull('obs')->count())}}%">
-                        Observação {{get_porcentagem($contratos->count(),$contratos->whereNull('contrato_id')->where('status',0)->whereNull('obs')->count())}}%
+                    <div class="progress-bar bg-primary"
+                         style="width:{{get_porcentagem($contratos->count(),$contratos->where('status',0)->whereNotIn('id',$contratos_servidorInativos_semPessoa_Prefeitura->pluck('id'))->whereNotNull('obs')->count())}}%">
+                        Observação {{get_porcentagem($contratos->count(),$contratos->whereNull('contrato_id')->where('status',0)->whereNull('obs')->count())}}
+                        %
+                    </div>
+                    <div class="progress-bar bg-dark"
+                         style="width: {{get_porcentagem($contratos->count(),$contratos->whereNull('contrato_id')->where('status',0)->where('n_parcela_referencia',1)->count())}}%">
+                        Novo
+                        contrato {{get_porcentagem($contratos->count(),$contratos->whereNull('contrato_id')->where('status',0)->where('n_parcela_referencia',1)->count())}}
+                        %
                     </div>
                 </div>
             </div>
@@ -105,7 +120,8 @@
                         <td>{{$contratos->where('origem',0)->where('status',1)->count()}}</td>
                         <td>{{$contratos->where('origem',1)->where('status',1)->whereNull('obs')->count()}}</td>
                         <td>
-                            <a href="{{url("consignataria/validada/$averbador->id/$consignataria->id")}}" class="btn btn-primary">Visualizar</a>
+                            <a href="{{url("consignataria/validada/$averbador->id/$consignataria->id")}}"
+                               class="btn btn-primary">Visualizar</a>
                         </td>
 
                     </tr>
@@ -114,7 +130,8 @@
                         <td>{{$contratos->where('origem',0)->where('status',0)->whereNull('obs')->whereNull('contrato_id')->count()}}</td>
                         <td>{{$contratos->where('origem',1)->where('status',0)->whereNotIn('servidor_id',$servidor_inativo->pluck('id'))->whereNull('contrato_id')->whereNull('obs')->count()}}</td>
                         <td>
-                            <a href="{{url("consignataria/naovalidado/$averbador->id/$consignataria->id")}}" class="btn btn-primary">Visualizar</a>
+                            <a href="{{url("consignataria/naovalidado/$averbador->id/$consignataria->id")}}"
+                               class="btn btn-primary">Visualizar</a>
                         </td>
 
                     </tr>
@@ -126,7 +143,8 @@
                         <td>{{$contratos_servidorInativos_semPessoa_Banco->count()}}</td>
 
                         <td>
-                            <a href="{{url("consignataria/sempessoa/$averbador->id/$consignataria->id")}}" class="btn btn-primary">Visualizar</a>
+                            <a href="{{url("consignataria/sempessoa/$averbador->id/$consignataria->id")}}"
+                               class="btn btn-primary">Visualizar</a>
                         </td>
 
                     </tr>
@@ -136,7 +154,8 @@
                         <td>{{$contratos_servidorInativos_comPessoa_Banco->count()}}</td>
 
                         <td>
-                            <a href="{{url("consignataria/semservidor/$averbador->id/$consignataria->id")}}" class="btn btn-primary">Visualizar</a>
+                            <a href="{{url("consignataria/semservidor/$averbador->id/$consignataria->id")}}"
+                               class="btn btn-primary">Visualizar</a>
                         </td>
 
                     </tr>
@@ -145,7 +164,8 @@
                         <td>{{$contratos->where('origem',0)->where('status',0)->whereNotNull('contrato_id')->whereNotIn('servidor_id',$servidor_inativo->pluck('id'))->whereNull('obs')->count()}}</td>
                         <td>{{$contratos->where('origem',1)->where('status',0)->whereNotNull('contrato_id')->whereNotIn('id',$contratos_servidorInativos_comPessoa_Banco->pluck('id'))->whereNotIn('id',$contratos_servidorInativos_semPessoa_Banco->pluck('id'))->whereNull('obs')->count()}}</td>
                         <td>
-                            <a href="{{url("consignataria/semelhante/$averbador->id/$consignataria->id")}}" class="btn btn-primary">Visualizar</a>
+                            <a href="{{url("consignataria/semelhante/$averbador->id/$consignataria->id")}}"
+                               class="btn btn-primary">Visualizar</a>
                         </td>
 
                     </tr>
@@ -153,6 +173,15 @@
                         <td>Contratos com Observação</td>
                         <td>{{$contratos->where('origem',0)->where('status',0)->whereNotIn('id',$contratos_servidorInativos_semPessoa_Prefeitura->pluck('id'))->whereNotNull('obs')->count()}}</td>
                         <td>{{$contratos->where('origem',1)->where('status',0)->whereNotNull('obs')->count()}}</td>
+                        <td>
+                            <a href="{{route('consignataria.validada',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>Contratos novo Contrato</td>
+                        <td>{{$contratos->where('status',0)->where('n_parcela_referencia',1)->count()}}</td>
+                        <td>{{$contratos->where('status',0)->where('n_parcela_referencia',1)->count()}}</td>
                         <td>
                             <a href="{{route('consignataria.validada',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
                         </td>

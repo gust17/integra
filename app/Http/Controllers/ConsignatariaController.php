@@ -167,7 +167,10 @@ class ConsignatariaController extends Controller
     {
         $consignataria = Consignataria::find($consignataria);
         $averbador = Averbador::find($averbador);
-        $contratos = Validados::where('consignataria_id', $consignataria->id)->where('averbador_id', $averbador->id)->get();
+       // $contratos = Validados::where('consignataria_id', $consignataria->id)->where('averbador_id', $averbador->id)->get();
+        $contratos = Contrato::where('consignataria_id',$consignataria->id)->where('status',1)->get();
+
+       // dd($contratos);
 
         // dd($contratos);
 
@@ -183,7 +186,7 @@ class ConsignatariaController extends Controller
         $averbador = Averbador::find($averbador);
 
         $contratos = Contrato::where('consignataria_id', $consignataria->id)->where('averbador_id', $averbador->id)->get();
-        $contratos = $contratos->where('status', 0)->whereNull('contrato_id')->whereNull('obs');
+        $contratos = $contratos->where('status', 0)->whereNull('contrato_id')->whereNull('obs')->where('n_parcela_referencia','!=',1);
         $title = 'Não Validadas';
         return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title', 'averbador'));
 
