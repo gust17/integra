@@ -121,7 +121,14 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
             if ($this->prazo_remanescente) {
                 $prestacao_atual = $row[$this->prazo_total] - $row[$this->prazo_remanescente] + 1;
             } else {
-                $prestacao_atual = 0;
+                if ($this->data_primeiro_desconto) {
+                    // dd($row[$this->data_primeiro_desconto]);
+                    $prestacao_atual = validanovadataQTD($row[$this->data_primeiro_desconto]);
+                  //  dd($prestacao_atual,$row);
+                } else {
+                    $prestacao_atual = 0;
+                }
+
             }
         }
         //dd($prestacao_atual);
@@ -159,14 +166,11 @@ class ContratoBancoImport implements ToModel, WithHeadingRow, WithGroupedHeading
         $servidor = Servidor::where('matricula', $matricula)->first();
 
 
-
         if (!$servidor) {
             $pessoa = $pessoaService->buscaPessoa($cpf) ?: $pessoaService->createPessoa($nome, $cpf, ativo: 0);
 
             $servidor = $servidorService->createServidor($pessoa->id, $matricula, $this->consignante_id, 0, $this->averbador_id);
         }
-
-
 
 
         $contrato = \App\Models\Contrato::where('origem', 0)

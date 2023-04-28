@@ -48,6 +48,7 @@ Route::get('consignataria/sempessoa/{averbador}/{consignataria}', [\App\Http\Con
 Route::get('consignataria/semservidor/{averbador}/{consignataria}', [\App\Http\Controllers\ConsignatariaController::class, 'sem_servidor']);
 Route::get('consignataria/semelhante/{averbador}/{consignataria}', [\App\Http\Controllers\ConsignatariaController::class, 'semelhante']);
 Route::get('consignataria/validada/{averbador}/{consignataria}', [\App\Http\Controllers\ConsignatariaController::class, 'validada']);
+Route::get('consignataria/novocontrato/{averbador}/{consignataria}', [\App\Http\Controllers\ConsignatariaController::class, 'novo_contrato']);
 Route::get('consignatarias/{id}/contratos_sem_pessoa', [\App\Http\Controllers\ConsignatariaController::class, 'sem_pessoa'])->name('consignataria.sem_pessoa');
 Route::get('consignatarias/{id}/contratos_sem_servidor', [\App\Http\Controllers\ConsignatariaController::class, 'sem_servidor'])->name('consignataria.sem_servidor');
 Route::get('consignatarias/{id}/sem_prefeitura', [\App\Http\Controllers\ConsignatariaController::class, 'sem_prefeitura'])->name('consignataria.sem_prefeitura');
@@ -901,17 +902,22 @@ Route::get('testeleitura', function () {
 
     foreach ($data as $item) {
         $pessoa = Pessoa::where('cpf', limpa_corrige_cpf($item['CPF']))->with('servidors')->first();
-        //dd($item);
+        // dd($item);
         $consignataria = \App\Models\Consignataria::where('name', $item['Banco'])->first();
 
         //dd($consignataria);
         if (!$consignataria) {
             $consignataria = \App\Models\Consignataria::create(['name' => $item['Banco']]);
         }
+
+        $servidor = Servidor::where('matricula', $item['Evento'])->first();
+
+        //dd($servidor);
         $grava = [
             'consignante_id' => $pessoa->servidors[0]->consignante->id,
             'consignataria_id' => $consignataria->id,
             'pessoa_id' => $pessoa->id,
+            'matricula' => $servidor->id,
             'valor' => corrige_dinheiro($item['Valor'])
         ];
 
@@ -924,74 +930,59 @@ Route::get('testeleitura', function () {
 });
 
 Route::get('continuabusca', function () {
-    // $contratos = \App\Models\Contrato::where('consignataria_id',7)->delete();
-    //$contratos->destroy();
 
-    // dd($contratos);
-    //dd($contratos->toArray());
-    $consignataria = 3;
+    $consignataria = 1;
     $somados = \App\Models\Somado::where('consignataria_id', $consignataria)->get();
-    $pessoas = Pessoa::whereHas('servidors', function ($query) {
-        $query->whereHas('contratos');
-    })
-        ->with(['servidors' => function ($query) {
-            $query->whereHas('contratos');
-            // aqui você pode definir quais atributos do modelo Servidor devem ser carregados junto com a consulta dos contratos, por exemplo:
-            // $query->select('id', 'nome', '...');
-            // $query->with('outro_relacionamento');
-            // etc.
-            //
-            // ou simplesmente carregar todos os atributos com $query->select('*');
-            // ou $query->with('*');
-            //
-            // aqui o importante é adaptar a seleção de atributos e/ou relacionamentos
-            // conforme sua necessidade para evitar excesso de dados desnecessários na consulta.
-        }])
-        ->get();
     $geral = [];
-    foreach ($somados as $somado) {
 
+    foreach ($somados as $somado) {
         $soma = 0;
         $guardacontrato = [];
         $pessoa = Pessoa::find($somado->pessoa_id);
 
         foreach ($pessoa->servidors as $servidor) {
-            $soma += $servidor->contratos->where('n_parcela_referencia', "!=", 1)->where('status', 0)->where('consignataria_id', $consignataria)->sum('valor_parcela');
+            $contratos = $servidor->contratos
+                ->where('n_parcela_referencia', "!=", 0)
+                ->where('status', 0)
+                ->where('consignataria_id', $consignataria)
+                ->whereNotIn('id', array_column($guardacontrato, 'contrato_id'))
+                ->sortBy('valor_parcela');
 
-
-            foreach ($servidor->contratos->where('n_parcela_referencia', "!=", 1)->where('status', 0)->where('consignataria_id', $consignataria) as $contrato) {
-
-
-                //  if ($soma - $contrato->valor_parcela == $somado->valor) {
-                //        $soma = $soma - $contrato->valor_parcela;
-
-                //       } else {
-                $guardacontrato[] = ['contrato_id' => $contrato->id, 'valor_parcela' => $contrato->valor_parcela, 'parcela_atual' => $contrato->n_parcela_referencia];
-                //   }
-
-
-            }
-
-        }
-
-
-        if ($soma > 0) {
-            if (floatval($soma) <= floatval($somado->valor)) {
-                $geral[] = [$soma, $somado->valor, $somado->pessoa->name, $pessoa->name, 'contratos' => $guardacontrato];
+            foreach ($contratos as $contrato) {
+                $valor_total = $soma + $contrato->valor_parcela;
+                if (abs($valor_total - $somado->valor) < abs($soma - $somado->valor)) {
+                    $soma = $valor_total;
+                    $guardacontrato[] = [
+                        'contrato_id' => $contrato->id,
+                        'valor_parcela' => $contrato->valor_parcela,
+                        'parcela_atual' => $contrato->n_parcela_referencia
+                    ];
+                }
             }
         }
 
-
+        if (!empty($guardacontrato)) {
+            $geral[] = [
+                'soma' => $soma,
+                'valor' => $somado->valor,
+                'somado' => $somado->pessoa->name,
+                'pessoa' => $pessoa->name,
+                'contratos' => $guardacontrato,
+                'matricula' => $somado->matricula
+            ];
+        }
     }
 
-   // dd($geral);
     foreach ($geral as $item) {
         foreach ($item['contratos'] as $contrato) {
             $busca = \App\Models\Contrato::find($contrato['contrato_id']);
-            $busca->fill(['status' => 1]);
+            $busca->fill(['status' => 1, 'servidor_id' => $item['matricula']]);
             $busca->save();
         }
     }
+
     //  return view('show_contratos_geral', compact('geral'));
 
 });
+
+

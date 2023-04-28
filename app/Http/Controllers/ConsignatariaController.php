@@ -202,7 +202,7 @@ class ConsignatariaController extends Controller
             $query->whereHas('pessoa', function ($query) {
                 $query->where('ativo', false);
             });
-        })->where('averbador_id', $averbador->id)->get();
+        })->where('averbador_id', $averbador->id)->where('status',0)->get();
 
         $title = "Sem Pessoa";
         return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title', 'averbador'));
@@ -218,7 +218,7 @@ class ConsignatariaController extends Controller
             $query->where('ativo', false)->whereHas('pessoa', function ($query) {
                 $query->where('ativo', true);
             });
-        })->where('averbador_id', $averbador->id)->get();
+        })->where('averbador_id', $averbador->id)->where('n_parcela_referencia',"!=",1)->where('status',0)->get();
 
         $title = "Sem Servidor(Matricula)";
 
@@ -276,13 +276,15 @@ class ConsignatariaController extends Controller
 
     }
 
-    public function novo_contrato($id)
+    public function novo_contrato($averbador,$consignataria)
     {
-        $consignataria = Consignataria::find($id);
+        $consignataria = Consignataria::find($consignataria);
+        $servidor_inativo = Servidor::where('ativo',0)->pluck('id');
+        $averbador = Consignataria::find($averbador);
         $id_reterirar_consulta = $consignataria->contratos->whereNotNull('contrato_id')->pluck('contrato_id')->toArray();
-        $contratos = $consignataria->contratos->where('n_parcela_referencia', 1)->whereNotIn('id', $id_reterirar_consulta)->whereNull('contrato_id');
+        $contratos = $consignataria->contratos->where('n_parcela_referencia', 1)->whereNotIn('id', $id_reterirar_consulta)->whereNull('contrato_id')->whereNotIn('servidor_id',$servidor_inativo);
         $title = "Renegociação ou novo contrato";
-        return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title'));
+        return view('consignatarias.show_contratos_geral', compact('contratos', 'consignataria', 'title','averbador'));
     }
 
 

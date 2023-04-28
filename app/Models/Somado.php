@@ -13,6 +13,7 @@ class Somado extends Model
         'consignante_id',
         'consignataria_id',
         'pessoa_id',
+        'matricula',
         'valor'
     ];
 

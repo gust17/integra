@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignIdFor(\App\Models\Consignante::class);
             $table->foreignIdFor(\App\Models\Consignataria::class);
             $table->foreignIdFor(\App\Models\Pessoa::class);
+            $table->string('matricula');
             $table->float('valor');
             $table->timestamps();
         });

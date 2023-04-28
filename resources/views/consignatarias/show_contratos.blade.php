@@ -127,8 +127,8 @@
                     </tr>
                     <tr>
                         <td>Contratos Não Validados</td>
-                        <td>{{$contratos->where('origem',0)->where('status',0)->whereNull('obs')->whereNull('contrato_id')->count()}}</td>
-                        <td>{{$contratos->where('origem',1)->where('status',0)->whereNotIn('servidor_id',$servidor_inativo->pluck('id'))->whereNull('contrato_id')->whereNull('obs')->count()}}</td>
+                        <td>{{$contratos->where('origem',0)->where('status',0)->whereNull('obs')->where('n_parcela_referencia',"!=",1)->whereNull('contrato_id')->count()}}</td>
+                        <td>{{$contratos->where('origem',1)->where('status',0)->whereNull('obs')->where('n_parcela_referencia',"!=",1)->count()}}</td>
                         <td>
                             <a href="{{url("consignataria/naovalidado/$averbador->id/$consignataria->id")}}"
                                class="btn btn-primary">Visualizar</a>
@@ -183,7 +183,7 @@
                         <td>{{$contratos->where('status',0)->where('n_parcela_referencia',1)->count()}}</td>
                         <td>{{$contratos->where('status',0)->where('n_parcela_referencia',1)->count()}}</td>
                         <td>
-                            <a href="{{route('consignataria.validada',$consignataria->id)}}" class="btn btn-primary">Visualizar</a>
+                            <a href="{{url("consignataria/novocontrato/$averbador->id/$consignataria->id")}}" class="btn btn-primary">Visualizar</a>
                         </td>
 
                     </tr>

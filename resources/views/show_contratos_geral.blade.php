@@ -37,8 +37,8 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @dd($geral)
-                        @forelse($geral as $contrato)
+
+                        @forelse($contratos as $contrato)
 
                             <tr>
                                 <td>{{$contrato->servidor->pessoa->name}}</td>
