@@ -25,7 +25,7 @@ Auth::routes();
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function () {
     Route::get('/', 'AdminController@index');
-    Route::get('/users', 'UserController@index');
+    Route::get('/usuario', 'UserController@index');
     Route::get('/settings', 'SettingsController@index');
 });
 
