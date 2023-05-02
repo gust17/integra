@@ -333,10 +333,12 @@ return [
             'url' => 'averbadors',
             'icon' => 'fas fa-fw fa-building',
         ],
+
         [
             'text' => 'Usuarios',
             'url' => 'admin/user',
             'icon' => 'fas fa-fw fa-building',
+            'can' => 'is_admin'
         ],
 
 

@@ -46,7 +46,7 @@ class UserController extends Controller
 
     public function update(User $user, Request $request)
     {
-
+        //dd($request->all());
         $validator = $request->validate([
             'name' => 'required|string|max:255',
             'email' => [
@@ -61,6 +61,7 @@ class UserController extends Controller
 
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->is_admin = $request->is_admin ? true : false;
 
         if (!empty($request->password)) {
             $user->password = bcrypt($request->password);
@@ -70,5 +71,12 @@ class UserController extends Controller
         return redirect(url('admin/user'))->with('success', 'Usuario Atualizado com sucesso');
 
 
+    }
+
+    public function delete(User $user)
+    {
+
+        $user->delete();
+        return redirect(url('admin/user'))->with('success', 'Usuario deletado com sucesso');
     }
 }

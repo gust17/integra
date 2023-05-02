@@ -74,6 +74,14 @@
                 </span>
                         @enderror
                     </div>
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="is_admin" id="is_admin" {{ $user->is_admin ? 'checked' : '' }}>
+                            <label class="form-check-label" for="is_admin">
+                                {{ __('Admistrador') }}
+                            </label>
+                        </div>
+                    </div>
 
                     {{-- Confirm password field --}}
 

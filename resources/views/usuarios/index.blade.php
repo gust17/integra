@@ -29,7 +29,13 @@
                             <td>{{$user->name}}</td>
                             <td>
                                 <a href="{{url('admin/user/edit',$user)}}" class="btn btn-primary">Editar</a>
-                                <button class="btn btn-danger">Excluir</button>
+                                <form action="{{ route('user.destroy', $user) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-danger delete-user" data-name="{{ $user->name }}"
+                                            type="submit">Delete
+                                    </button>
+                                </form>
                             </td>
 
 
@@ -45,13 +51,14 @@
 @stop
 
 @section('css')
-
+    <link rel="stylesheet" href="sweetalert2.min.css">
 @stop
 @section('plugins.Datatables', true)
 @section('plugins.Select2', true)
 
 
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
     <script>
@@ -59,6 +66,29 @@
 
             $('#usuarios').DataTable();
 
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('.delete-user').click(function (event) {
+                event.preventDefault();
+                const form = event.target.form;
+                const name = $(event.target).data('name');
+                Swal.fire({
+                    title: 'Deseja continuar?',
+                    text: "Você não será capaz de reverter isso!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sim, delete!',
+                    cancelButtonText: 'Cancelar',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                })
+            });
         });
     </script>
 @stop
