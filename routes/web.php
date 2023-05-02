@@ -25,7 +25,12 @@ Auth::routes();
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function () {
     Route::get('/', 'AdminController@index');
-    Route::get('/usuario', 'UserController@index');
+    Route::get('/user', [\App\Http\Controllers\UserController::class, 'index']);
+    Route::get('/user/create', [\App\Http\Controllers\UserController::class, 'create']);
+    Route::put('/user/update/{user}', [\App\Http\Controllers\UserController::class, 'update']);
+    Route::delete('/user/destroy/{user}', [\App\Http\Controllers\UserController::class, 'delete'])->name('user.destroy');
+    Route::post('/user/store', [\App\Http\Controllers\UserController::class, 'store']);
+    Route::get('/user/edit/{user}', [\App\Http\Controllers\UserController::class, 'edit']);
     Route::get('/settings', 'SettingsController@index');
 });
 
