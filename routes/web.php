@@ -310,29 +310,30 @@ Route::post('comparacaoarquivos', function (Request $request) {
     $retorno = $request->file('retorno');
 
 
-    $fileContents = $remessa->get();
-    $lines = explode("\n", $fileContents);
-    $arquivoRemessa = [];
-    foreach ($lines as $line) {
+    if ($remessa) {
+        $fileContents = $remessa->get();
+        $lines = explode("\n", $fileContents);
+        $arquivoRemessa = [];
+        foreach ($lines as $line) {
 
-        //dd($line);
-        $matricula = intval(trim(substr($line, 218, 15)));
-        $verba = intval(trim(substr($line, 233, 4)));
-        $valor_parcela = (trim(substr($line, 82, 15)));
+            //dd($line);
+            $matricula = intval(trim(substr($line, 218, 15)));
+            $verba = intval(trim(substr($line, 233, 4)));
+            $valor_parcela = (trim(substr($line, 82, 15)));
 
-        $decimais = substr($valor_parcela, -2);
-        $valor_decimal = substr($valor_parcela, 0, -2) . "." . $decimais;
+            $decimais = substr($valor_parcela, -2);
+            $valor_decimal = substr($valor_parcela, 0, -2) . "." . $decimais;
 
-        $valor_parcela = floatval($valor_decimal);
-        $cpf = (trim(substr($line, 34, 11)));
-        $empresa = (trim(substr($line, 15, 3)));
+            $valor_parcela = floatval($valor_decimal);
+            $cpf = (trim(substr($line, 34, 11)));
+            $empresa = (trim(substr($line, 15, 3)));
 
-        $arquivoRemessa[] = ['matricula' => $matricula, 'verba' => $verba, 'valor_parcela' => $valor_parcela, 'cpf' => $cpf, 'empresa' => $empresa, 'linha' => $line];
-        //dd($empresa);
+            $arquivoRemessa[] = ['matricula' => $matricula, 'verba' => $verba, 'valor_parcela' => $valor_parcela, 'cpf' => $cpf, 'empresa' => $empresa, 'linha' => $line];
+            //dd($empresa);
 
 
+        }
     }
-
 
     $retornoBusca = $retorno->get();
     $retornoLinhas = explode("\n", $retornoBusca);
@@ -357,7 +358,144 @@ Route::post('comparacaoarquivos', function (Request $request) {
     }
 
 
-    //  dd($arquivoRetorno[0]);
+    dd($arquivoRetorno[0]);
+
+    $totalLinhaRemessa = count($arquivoRemessa);
+    $totalLinhaRetorno = count($arquivoRetorno);
+
+    $totalRemessa = number_format(array_sum(array_column($arquivoRemessa, 'valor_parcela')), 2, '.', '');
+    $totalRetorno = number_format(array_sum(array_column($arquivoRetorno, 'valor_parcela')), 2, '.', '');
+
+    $remessasNaoEncontradas = [];
+    $retornoNaoEncontradas = [];
+
+    foreach ($arquivoRemessa as $remessa) {
+        $remessaCpf = $remessa['cpf'];
+        $remessaVerba = $remessa['verba'];
+        $remessaValorParcela = $remessa['valor_parcela'];
+        $remessaMatricula = $remessa['matricula'];
+
+        $encontrado = false;
+
+        foreach ($arquivoRetorno as $retorno) {
+            $retornoCpf = $retorno['cpf'];
+            $retornoVerba = $retorno['verba'];
+            $retornoValorParcela = $retorno['valor_parcela'];
+            $retornoMatricula = $retorno['matricula'];
+
+            if (
+                $remessaCpf == $retornoCpf &&
+                $remessaVerba == $retornoVerba &&
+                $remessaValorParcela == $retornoValorParcela &&
+                $remessaMatricula == $retornoMatricula
+            ) {
+                $encontrado = true;
+                break;
+            }
+        }
+
+        if (!$encontrado) {
+            $remessasNaoEncontradas[] = $remessa;
+        }
+    }
+
+    foreach ($arquivoRetorno as $retorno) {
+        $retornoCpf = $retorno['cpf'];
+        $retornoVerba = $retorno['verba'];
+        $retornoValorParcela = $retorno['valor_parcela'];
+        $retornoMatricula = $retorno['matricula'];
+
+        $encontrado = false;
+
+        foreach ($arquivoRemessa as $remessa) {
+            $remessaCpf = $remessa['cpf'];
+            $remessaVerba = $remessa['verba'];
+            $remessaValorParcela = $remessa['valor_parcela'];
+            $remessaMatricula = $remessa['matricula'];
+
+            if (
+                $retornoCpf == $remessaCpf &&
+                $retornoVerba == $remessaVerba &&
+                $retornoValorParcela == $remessaValorParcela &&
+                $retornoMatricula == $remessaMatricula
+            ) {
+                $encontrado = true;
+                break;
+            }
+        }
+
+        if (!$encontrado) {
+            $retornoNaoEncontradas[] = $remessa;
+        }
+    }
+
+
+    return view('compara.relatorio', compact('totalRetorno', 'totalRemessa', 'totalLinhaRetorno', 'totalLinhaRemessa', 'remessasNaoEncontradas', 'retornoNaoEncontradas'));
+
+    //dd($totalRemessa, $totalRetorno, $totalLinhaRemessa, $totalLinhaRetorno, $remessasNaoEncontradas, $retornoNaoEncontradas);
+    //dd($correspondencias);
+
+});
+
+
+Route::post('comparacaoarquivosfloripa', function (Request $request) {
+    $remessa = $request->file('remessa');
+    $retorno = $request->file('retorno');
+
+
+    if ($remessa) {
+        $fileContents = $remessa->get();
+        $lines = explode("\n", $fileContents);
+        $arquivoRemessa = [];
+        foreach ($lines as $line) {
+
+            //dd($line);
+            // dd($line);
+            $matricula = intval(trim(substr($line, 0, 20)));
+
+            //dd($matricula);
+            $verba = intval(trim(substr($line, 46, 50)));
+            $valor_parcela = (trim(substr($line, 31, 15)));
+
+            $decimais = substr($valor_parcela, -2);
+            $valor_decimal = substr($valor_parcela, 0, -2) . "." . $decimais;
+
+            $valor_parcela = floatval($valor_decimal);
+            $cpf = (trim(substr($line, 20, 11)));
+            //$empresa = (trim(substr($line, 15, 3)));
+
+            $arquivoRemessa[] = ['matricula' => $matricula, 'verba' => $verba, 'valor_parcela' => $valor_parcela, 'cpf' => $cpf, 'linha' => $line];
+            //dd($empresa);
+
+
+        }
+        // dd($arquivoRemessa[0]);
+    }
+
+    $retornoBusca = $retorno->get();
+    $retornoLinhas = explode("\n", $retornoBusca);
+    $arquivoRetorno = [];
+    foreach ($retornoLinhas as $line) {
+
+
+        $matricula = intval(trim(substr($line, 0, 20)));
+        //$verba = intval(trim(substr($line, 52, 10)));
+        $verba = intval(trim(substr($line, 31, 10)));
+        $valor_parcela = corrige_dinheiro2((trim(substr($line, 56, 15))));
+//dd($verba);
+
+        //dd($valor_parcela);
+        $cpf = (trim(substr($line, 20, 11)));
+        //   $empresa = (trim(substr($line, 15, 4)));
+
+        $arquivoRetorno[] = ['matricula' => $matricula, 'verba' => $verba, 'valor_parcela' => $valor_parcela, 'cpf' => $cpf, 'linha' => $line];
+        //dd($empresa);
+
+
+    }
+
+    //dd($arquivoRemessa[1]);
+    // dd($arquivoRetorno[0]);
 
     $totalLinhaRemessa = count($arquivoRemessa);
     $totalLinhaRetorno = count($arquivoRetorno);

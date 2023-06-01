@@ -101,7 +101,7 @@
                 @forelse($remessasNaoEncontradas as $remessanaoEncontrada)
 
                     <tr>
-                        <td>{{$remessanaoEncontrada['empresa']}}</td>
+                        <td></td>
                         <td>{{$remessanaoEncontrada['cpf']}}</td>
                         <td>{{$remessanaoEncontrada['matricula']}}</td>
                         <td>{{$remessanaoEncontrada['verba']}}</td>
@@ -133,7 +133,7 @@
                 @forelse($retornoNaoEncontradas as $retornonaoEncontrada)
 
                     <tr>
-                        <td>{{$remessanaoEncontrada['empresa']}}</td>
+                        <td></td>
                         <td>{{$remessanaoEncontrada['cpf']}}</td>
                         <td>{{$remessanaoEncontrada['matricula']}}</td>
                         <td>{{$remessanaoEncontrada['verba']}}</td>

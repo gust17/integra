@@ -96,9 +96,11 @@ if (!function_exists('corrige_dinheiro2')) {
         $string = str_replace(".", "", $value); // substitui ponto por espaço
         $string = str_replace(",", ".", $string);
 
+
+
         //$valor_em_float = floatval(str_replace(',', '.', str_replace('.', '', substr($value, 3))));
 
-        return floatval($string);
+        return floatval($string)/100;
     }
 
 }
