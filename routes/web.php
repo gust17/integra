@@ -304,6 +304,9 @@ Route::get('continuabusca', function () {
 Route::get('comparacaoarquivos', function () {
     return view('compara.index');
 });
+Route::get('compara/new_layout', function () {
+    return view('compara.new_layout');
+});
 
 Route::post('comparacaoarquivos', function (Request $request) {
     $remessa = $request->file('remessa');

@@ -156,6 +156,13 @@
 
 
 @section('js')
+
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+
     <script> console.log('Hi!'); </script>
 
     <script>
@@ -165,14 +172,50 @@
                     "language":
                         {
                             "url": "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Portuguese-Brasil.json"
-                        }
+                        },
+                dom: 'Bfrtip',
+                buttons: [{
+                    extend: 'csv',
+                    text: 'Exportar para CSV',
+                    charset: "utf8"
+                },
+                    {
+                        extend: 'excel',
+                        text: 'Exportar para Excel'
+                    },
+                    {
+                        extend: 'pdf',
+                        orientation: 'landscape',
+                        text: 'Exportar para PDF'
+                    },
+                    'print',
+
+                ],
                 }
             )
             ;
             $('#retorno').DataTable({
                     "language": {
                         "url": "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Portuguese-Brasil.json"
-                    }
+                    },
+                dom: 'Bfrtip',
+                buttons: [{
+                    extend: 'csv',
+                    text: 'Exportar para CSV',
+                    charset: "utf8"
+                },
+                    {
+                        extend: 'excel',
+                        text: 'Exportar para Excel'
+                    },
+                    {
+                        extend: 'pdf',
+                        orientation: 'landscape',
+                        text: 'Exportar para PDF'
+                    },
+                    'print',
+
+                ],
                 }
             );
 
